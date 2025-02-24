@@ -1,0 +1,50 @@
+---
+title: "q3"
+author: "Silpa"
+date: "2025-01-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(biostat3)
+library(knitr)
+library(survival)
+library(collett)
+```
+
+## (a) Plots of survival
+
+```{r}
+# Prepare the data for survival analysis
+melanoma$calendar_period <- ifelse(melanoma$year8594 == "Diagnosed 75-84", "1975–1984", "1985–1994")
+
+# Create a survival object
+surv_object <- Surv(time = melanoma$surv_mm, event = melanoma$death_cancer)
+
+# Kaplan-Meier estimates by calendar period
+km_fit <- survfit(surv_object ~ calendar_period, data = melanoma)
+
+# Plot Kaplan-Meier curves 
+plot(km_fit,
+     col = c("blue", "red"),
+     lwd = 2,
+     conf.int = TRUE,
+     main = "Kaplan-Meier Survival Curves by Calendar Period",
+     xlab = "Time in months",
+     ylab = "Survival Probability")
+legend("topright", legend = levels(melanoma$calendar_period), 
+       col = c("blue", "red"), lwd = 2)
+```
+
+Without any formal statistical test and only relying in visual comparison, we can conclude that the patient survival is superior during the time period 1985-1994 compared to 1975-1984 as the 1985-1994 survival curve is consistently higher.
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

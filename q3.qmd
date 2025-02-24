@@ -1,0 +1,100 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Mark Clements
+format:
+  html:
+    minimal: true
+filters:
+  - webr
+execute:
+  echo: true
+  message: false
+  cache: false
+  fig-width: 7
+  fig-height: 6
+---
+
+# Exercise 3. Localised melanoma: Comparing estimates of cause-specific survival between periods; first graphically and then using the log rank test #
+
+- We will now analyse the full data set of patients diagnosed with localised skin melanoma. 
+- Each group should be prepared to present and discuss their findings. Ideally, the presentation should use Rmarkdown or Quarto (especially the `webr` filter for Quarto) and HTML.
+- For the R code, you should generally restrict your attention to the R packages used in the course. Within your group, you can suggest the introduction of **one** further R package on CRAN for each exercise.
+- For course development:
+  - Please note (a) how long this exercise takes and (b) any suggested improvements for the exercise (e.g. errors, ambuiguities, or if the exercises are overly difficult or too simple).
+
+------
+
+- We start by reading the data selecting those with a localised stage and then define a 1/0 varible for the events that we are interested in.
+
+```{webr-r}
+#| autorun: true
+library(biostat3)
+melanoma = biostat3::melanoma |>
+    subset(stage=="Localised") |> 
+    transform(death_cancer = ifelse( status == "Dead: cancer", 1, 0),
+              death_all = ifelse( status == "Dead: cancer" |
+                               status == "Dead: other", 1, 0))
+```
+
+We then list the first few observations to get an idea about the data.
+
+```{webr-r}
+#| autorun: true
+#| results: 'asis'
+library(knitr)    # kable()
+head(melanoma) |> knitr::kable("html")
+```
+
+
+## (a) Plots of survival ##
+
+- Estimate the cause-specific survivor function, using the Kaplan-Meier method with survival time in months, separately for each of the two calendar periods 1975–1984 and 1985–1994. The variable year8594 indicates whether a patient was diagnosed 1985–1994 or 1975–1984. Without making reference to any formal statistical tests, does it appear that patient survival is superior during the most recent period?
+
+```{webr-r}
+library(survival)
+```
+
+## (b) Plots of the hazards ##
+
+- Using either the `bshazard` or `muhaz` package, plot the hazard function.
+  1. At what point in the follow-up is mortality highest?
+  2. Does this pattern seem reasonable from a clinicial/biological perspective? [HINT: Consider the disease with which these patients were classified as being diagnosed along with the expected fatality of the disease as a function of time since diagnosis.]
+
+```{webr-r}
+library(bshazard)
+## library(muhaz) # not available on webR:(
+```
+
+## (c) Testing for differences ##
+
+- Use the log rank and the generalised Wilcoxon test to determine whether there is a statistically significant difference in patient survival between the two periods. What is the null hypothesis? When would you prefer the generalised Wilcoxon test over the log rank test?
+
+```{webr-r}
+library(survival)
+```
+
+## (d) Cause-specific mortality rates ##
+
+- Estimate cause-specific mortality rates for each age group, and graph the Kaplan-Meier estimates of the cause-specific survivor function for each age group. Are there differences between the age groups? Is the interpretation consistent between the mortality rates and the survival proportions?
+
+```{webr-r}
+```
+
+- What are the units of the estimated hazard rates?
+
+## (e) Change of time scale ##
+
+- Repeat the mortality rate and survival calculations using years instead of months. This is equivalent to dividing the time variable by 12 so all analyses will be the same except the units of time will be different (for example, the graphs will have different labels).
+
+```{webr-r}
+```
+
+- Note that here we are **not** truncating the times.
+
+## (f) Differences by sex ##
+
+- Study whether there is evidence of a difference in patient survival between males and females. Estimate both the hazard and survival functions and use the log rank test to test for a difference.
+
+```{webr-r}
+```

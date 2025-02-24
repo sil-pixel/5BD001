@@ -1,0 +1,1530 @@
+```{=org}
+#+cite_export: natbib amalike
+```
+```{=org}
+#+startup: beamer
+```
+```{=org}
+#+BEAMER_THEME: Madrid
+```
+```{=org}
+#+COLUMNS: %45ITEM %10BEAMER_ENV(Env) %10BEAMER_ACT(Act) %4BEAMER_COL(Col) %8BEAMER_OPT(Opt)
+```
+# Lecture: Course introduction
+
+## Friendly faces
+
+-   Course director: Mark Clements
+    ([[mailto:mark.clements@ki.se](mailto:mark.clements@ki.se)](mailto:mark.clements@ki.se))
+
+-   Course administrator: Kristina Leif
+    ([[mailto:kristina.leif@ki.se](mailto:kristina.leif@ki.se)](mailto:gunilla.nilsson.roos@ki.se))
+
+-   Teachers: Paul Dickman (and others).
+
+## Overview of the course
+
+
+
+  Week   Topic
+  ------ -------------------------------------------
+  4      Introduction
+         Survival and hazard estimation
+  5      Counting processes
+         Likelihood derivations
+  6      Poisson regression
+  7      Cox regression
+  8      Standard parametric models
+         Flexible parametric models
+  9      Frailty models and non-collapsibility
+         Recurrent events
+  10     Joint models; interval censoring
+         Restricted mean survival; prediction
+  11     Competing events
+         Multistate models
+  12     Dependent censoring, illness-death models
+         Relative survival
+  13     Exam work
+
+## Teaching format {#teaching-format beamer_opt="allowframebreaks,label="}
+
+-   The classroom will be a mixture of **lectures** and **group
+    activities**.
+
+    -   The lectures will be based primarily on Collett
+        [@collett2023modelling], with some input from Aalen et
+        [@Aalen_Borgan_Gjessing_2008] and other material.
+    -   The group activities will include:
+        -   Working on computing examples.
+        -   Working on mathematical derivations.
+        -   Discussions of specific journal articles.
+        -   Reporting on the computing problems, mathematical
+            derivations and journal discussions.
+
+-   We have computing examples for some of the material. Those examples
+    currently use Quarto with webR for interactive use. Some of you may
+    prefer Rmarkdown (for discussion).
+
+-   There is also a **collett** package on CRAN
+    (<https://CRAN.R-project.org/package=collett>) that we will develop
+    during the course.
+
+## Learning outcomes {#learning-outcomes beamer_opt="allowframebreaks"}
+
+-   The course aims to equip the student with an understanding of
+    fundamental concepts in survival analysis (censoring, truncation,
+    timescales, and the hazard and survival functions) and methods for
+    modelling time-to-event (survival) data, including a rigorous
+    statistical formulation of the likelihoods and partial likelihoods,
+    along with the competence, skills, and judgement to appropriately
+    apply such methods in biomedical research.
+
+-   Upon completion of the course, the student should be able to:
+
+    -   Regarding knowledge and understanding:
+
+        -   Define key concepts in survival analysis, including
+            censoring and truncation, and explain the relevance of these
+            concepts for the analysis of time-to-event data in
+            biomedical research.
+        -   Understand the concept of timescales in statistical models
+            for time-to-event data.
+
+    -   Regarding competence and skills:
+
+        -   Estimate and compare survival functions and state
+            probabilities using parametric and non-parametric methods,
+            including testing for and modelling time-varying effects.
+        -   Propose a suitable statistical model for assessing a
+            specific research hypothesis using data from a time-to-event
+            study, fit the model using standard statistical software,
+            evaluate the fit of the model, and interpret the results.
+        -   Be able to control for different timescales using standard
+            statistical software, and argue for an appropriate timescale
+            for a given research hypothesis.
+        -   Understand how to assess discrimination and calibration for
+            predictions based on time-to-event models.
+
+    -   Regarding judgement and approach:
+
+        -   Critically evaluate the methodological aspects (design and
+            analysis) of a scientific article in biomedicine reporting a
+            time-to-event study.
+
+## Assessment
+
+-   For formative assessment, there were will be a group project due at
+    the end of week 9. The project will involve coding and a
+    presentation. The evaluation will be pass/fail.
+-   For summative assessment, there will be an individual-based written
+    take-home examination during the last week of the course. The
+    evaluation will be VG/G/U.
+-   Detailed assessment criteria will be provided.
+
+## Take-home examination {#take-home-examination beamer_opt="allowframebreaks"}
+
+-   The course grade is based solely on an individual-based take-home
+    written examination. The exam requires you to understand the
+    concepts of survival analysis, and to code and interpret data
+    analyses based on R. Instructions:
+
+    -   The examination is individual-based: **you are not allowed to
+        cooperate with anyone** -- although you are encouraged to
+        consult the available literature. The teachers will use
+        iThenticate to check for plagiarism.
+
+```{=html}
+<!-- -->
+```
+-   Do not write answers by hand: please use Word, LaTeX or a similar
+    format for your examination report.
+
+-   Motivate all answers and show all computer code, output and
+    calculations in your examination report, but write succinctly.
+    Define any notation that you use for equations. The examination
+    report should be written in English.
+
+-   You are expected to be able to write R computer code and interpret
+    its output.
+
+-   You should declare your use of generative AI (see next slide)
+
+## Use of generative AI in the course
+
+-   For guidelines on the use of generative AI, see
+    <https://staff.ki.se/education-support/organisation-of-higher-education-at-ki/programme-committee-for-the-study-programmes-in-biomedicine>
+-   Generative AI are important resources -- you should use them:)
+-   **Importantly, you should declare how you have used generative AI in
+    your exam**
+-   I strongly encourage you **to understand any code that you use from
+    generative AI**. If you do not understand the code, then it may not
+    do what you want...
+
+## Software used in the course {#software-used-in-the-course beamer_opt="allowframebreaks"}
+
+-   I will primarily use **R** for this course.
+    -   The exercises and exam should be completed using R (TODO:
+        discuss alternatives).
+    -   Only use R packages that have been used in the course. For some
+        of the exercises, I have suggested adding one additional R
+        package -- but those additional packages should not be used for
+        the exam.
+-   We will use **Quarto/Rmarkdown** for some of the exercises. We will
+    experiment with using **webR** with Quarto for interactive examples
+    (the `collett`{.verbatim} package has not yet found its way from
+    CRAN to the webR archive).
+-   The lecture material uses **Org Mode** (another text-based markup
+    that depends on the **Emacs** editor), but you are not expected to
+    use either Org Mode or Emacs:)
+-   Statisticians have been contributing code to R (and previously to
+    **S+**) for a long time (30--40 years), so that there is a **large
+    body of code** available. The quality of the code varies from
+    excellent to ... poor.
+-   R probably has the most extensive functionality for time-to-event
+    analyses.
+-   **Stata** has arguably the next most extensive functionality for
+    time-to-event analyses. Paul Dickman and Therese Andersson are both
+    strong Stata users.
+-   **SAS** includes some time-to-event procedures. I like its
+    implementation of time-varying Cox regression.
+-   **SPSS** has comparatively limited time-to-event functionality.
+-   **Julia** has comparatively limited time-to-event functionality.
+    Watch this space.
+-   **Python** has comparatively limited time-to-event functionality.
+    Watch this space.
+    -   The **lifelines** package (<https://lifelines.readthedocs.io>)
+        is a good start. Interestingly, lifelines includes a model
+        (`CRCSplineFitter`{.verbatim}) that is based on our research:).
+    -   **pycox** is a very nice package for using Cox regression with
+        neural networks using **PyTorch**. Classy stuff.
+
+## Outline of today\'s material
+
+-   Definitions and mathematical relationships
+-   Types of time-to-event data
+-   Non-parametric survival estimation
+-   Hazard estimation
+-   Testing for differences in survival
+
+## Definitions (group work) {#definitions-group-work beamer_opt="allowframebreaks"}
+
+**Guidance: within your group, discuss the following questions and be
+prepared to discuss your findings with the class.** 
+
+Consider a random variable $T$ for the time to some event. Initially
+consider that $T$ is **discrete**. Questions:
+
+1.  Mathematically define the **cumulative distribution function** and
+    **probability mass function** for $T$.
+2.  Let **survival** be defined as one minus the cumulative distribution
+    function. Does this definition \"make sense\"?
+3.  Let the **discrete time hazard** for $T$ at time $t_i$ be defined as
+    the probability mass function divided by the survival function at
+    time $t_{i-1}$. How would you interpret this function?
+
+ **Guidance: within your group, discuss the following
+questions and be prepared to discuss your findings with the class.**
+
+
+Now consider that $T$ is **absolutely continuous**. Questions:
+
+1.  Based on your previous courses in probability theory, mathematically
+    define the **cumulative distribution function** and **probability
+    density function** for $T$.
+2.  Let **survival** be defined as one minus the cumulative distribution
+    function. Does this definition \"make sense\"?
+3.  Let the **continuous time hazard** for $T$ be defined as the
+    probability density function divided by the survival function. How
+    would you interpret this function?
+4.  Compare your definitions with definitions (1.1)--(1.3) in Collett
+    (2023). Discuss any differences.
+
+## Mathematical relationships {#mathematical-relationships beamer_opt="allowframebreaks"}
+
+-   Let the cumulative distribution function for $T$ be $F(t)$, with
+    survival $S(t)=1-F(t)$.
+-   Domains: $0\leq F(t) \leq 1$, $0\leq S(t) \leq 1$, $f(t)\geq 0$,
+    $h(t)\geq 0$
+-   We have that
+    $f(t)=\frac{dF(t)}{dt}=\frac{d(1-S(t))}{dt}=-\frac{dS(t)}{dt}$
+-   Given survival and the pdf, we can calculate the hazard:
+    $h(t)=f(t)/S(t-)=\lim_{\delta\rightarrow 0} P(t\leq T < t+\delta| T\geq t)/delta$
+-   Given survival, we can calculate the hazard:
+    -   $h(t) = f(t)/S(t-) = -\frac{dS(t)}{dt}/S(t-)$
+    -   $h(t)=-\frac{d\log(S(t))}{dt}$
+
+```{=html}
+<!-- -->
+```
+-   Usefully, $f(t)=h(t)S(t-)$
+
+**Exercise: show that \$h(t)=-`\frac{d\log(S(t))}{dt}`{=latex}\$**
+
+ Given the hazard, we can calculate survival:
+
+
+
+```{=latex}
+\begin{align*}
+  Pr(T>t) &= \lim_{n\rightarrow\infty} \prod_{i=1}^n Pr\left(T > t\frac{i}{n}|T \geq t\frac{i-1}{n}\right) \\
+  &= \lim_{n\rightarrow\infty} \prod_{i=1}^n \left(1-h(t\frac{i}{n})\frac{1}{n}\right) \\
+  &= \lim_{n\rightarrow\infty} \prod_{i=1}^n \exp\left(-h(t\frac{i}{n})\frac{1}{n}\right) \\
+  &= \exp\left(-\lim_{n\rightarrow\infty} \sum_{i=1}^n h(t\frac{i}{n})\frac{1}{n}\right) \\
+  &= \exp\left(-\int_0^t h(u) du\right)  
+\end{align*}
+```
+**Exercise: what are the assumptions for each step of this derivation?**
+
+
+
+-   The **cumulative hazard** $H(t)=\displaystyle\int_0^t h(u) du$ is
+    often used in survival analysis.
+-   Trivially, $H(t)=-\log(S(t))$ and $H'(t)=h(t)$. Also, $H(t)\geq 0$.
+-   Note that survival can also be constructed from **ordinary
+    differential equations**:
+
+```{=latex}
+\begin{align*}
+  S(0)=1,\qquad & \frac{dS(t)}{dt} = -h(t)S(t) \\
+  F(0)=0,\qquad & \frac{dF(t)}{dt} = h(t)S(t)
+\end{align*}
+```
+-   These are an example of **Kolmogorov\'s forward differential
+    equations** for **Markov models.**
+
+## Types of observed data for time-to-event outcomes
+
+We could have that an event:
+
+-   Happened *at* an exact time
+-   Happened *before or at* a given time: **left censoring**
+-   Did not happen *by* a given time: **right censoring**
+-   Happened *between* two times: **interval censoring**
+
+We could also have that:
+
+-   An individual was only followed from a given time: **left
+    truncation**
+-   We restrict to individuals who had an event by a maximum time τ:
+    **right truncation**
+
+## Likelihoods for different data
+
+
+
+  Entry time   Data type                               Likelihood
+  ------------ --------------------------------------- ----------------------------------
+  0            Exact time $t$                          $f(t)=h(t)S(t)$
+  0            Left censored: $T\leq t$                $F(t)=1-S(t)$
+  0            Right censored: $T > t$                 $S(t)$
+  0            Interval censored: $t_1 < T \leq t_2$   $S(t_1) - S(t_2)$
+  $t_0$        Exact time $t$                          $f(t)/S(t_0) = h(t)S(t)/S(t_0)$
+  $t_0$        Right censored: $T > t$                 $S(t)/S(t_0)$
+  $t_0$        Interval censored: $t_1 < T \leq t_2$   $\frac{S(t_1) - S(t_2)}{S(t_0)}$
+
+**Exercise: ignoring covariates, can you think of any other data types
+for time-to-event data?**
+
+## Likelihoods for different observations (follow-up from time 0)
+
+
+
+## Likelihoods for different observations
+
+
+
+## Names
+
+Censoring
+:   probability that an event happened before or after some time
+
+Truncation
+:   condition that follow-up started or finished at some time
+
+## Motivating examples (group work) {#motivating-examples-group-work beamer_opt="allowframebreaks"}
+
+For the small group work, assume that there are six groups. Within your
+group, discuss three or four examples. Prepare 1--2 slides on Google
+Slides
+(<https://docs.google.com/presentation/d/139oQG13V0ts_ffz55FthCObG63RvNWd1F-YYYWgd3zw/edit?usp=sharing>)
+to discuss your group\'s examples during the next course occasion.
+
+
+``` {r}
+set.seed(12345)
+local({
+    groups = 1:6
+    out = rbind(sample(groups), sample(6+groups), sample(12+groups), sample(18+groups))
+    colnames(out) = paste("Group",groups)
+    out[out>21] = NA
+    out
+})
+```
+
+
+
+  **Guidance: For each example,
+please describe the study design (e.g. cohort), what data would be
+collected, describe any uncertainty in the recorded data, specify the
+time origin, and possibly write out a likelihood for the data.**
+
+
+1.  Using data from a cancer register, how does the time from diagnosis
+    of cancer to death due to the cancer vary by age and sex?
+2.  Using data from a cancer register, how does the time from diagnosis
+    of cancer to death due to any cause vary by age and sex?
+3.  In a randomised controlled trial, is survival improved by a new
+    treatment compared with standard clinical care?
+4.  In a randomised screening trial, are prostate cancer incidence and
+    prostate cancer mortality affected by screening using the
+    prostate-specific antigen test?
+5.  In a randomised clinical trial, does progression-free survival (that
+    is, no progression and alive) differ between a new drug or placebo?
+6.  In the Chronic Myeloid Leukemia quality register, describe whether
+    the time from remission to relapse varies by drug.
+7.  Describe the time to re-offending after being released from prison.
+8.  Describe the time between two attempts to donate a unit of blood for
+    transfusion purposes
+9.  Model the time from human immunodeficiency virus (HIV) infection to
+    acquired immunodeficiency syndrome (AIDS)
+10. Predict the time to the first goal (or next goal) in a hockey game.
+11. How does the incidence of lung cancer change after quitting
+    cigarette smoking?
+12. Describe the age of onset of dementia based on patient recall.
+13. Describe the age of onset of dementia based on current status from
+    clinical visits.
+14. Does the mean of a biomarker differ between cancer patients and the
+    general population if the biomarker is only measured precisely if it
+    is above the lowest detection limit?
+15. What is the five-year probability of developing metastatic cancer
+    following a diagnosis of localised prostate cancer?
+16. What proportion of men are living with a diagnosis of prostate
+    cancer in Stockholm?
+17. What proportion of men diagnosed with prostate cancer and treated
+    with a radical prostatectomy are on sick leave?
+18. Estimate the number of new infections per COVID case.
+19. How does prostate cancer incidence vary by small areas in the
+    Stockholm region?
+20. Can we use AI assisted histopathology to improve treatment
+    assignment to chemotherapy for intermediate risk breast cancer
+    patients?
+21. Is a sibling who lives in a more deprived neighbourhood at age 15
+    years more likely to commit a crime or be admitted for depression
+    than their sibling?
+
+## Counting processes notation
+
+-   For an individual, the tuple $((t_1,t_2],e)$ is used to define an
+    at-risk interval between (but not including) $t_1$ and (and
+    including) $t_2$ with event indicator $e$.
+-   This **counting process notation** can be used to represent left
+    truncation and right censoring, which is arguably the most common
+    form of time-to-event data.
+
+
+
+-   Brief comments on open and closed intervals:
+    -   Counting process notation is assumed to be closed to (that is,
+        include) the **right**.
+    -   Most of the estimators we will use are for intervals that are
+        cadlag (continuous from the right, limit from the left), which
+        are closed to the **left**. As an intuition, many of the
+        non-parametric estimators change when there is an event.
+
+## R package: survival
+
+-   The **survival** package is a recommended package in R.
+-   Key functions:
+    -   **Surv()** for specifying a time to event
+    -   **survfit()** for calculating Kaplan-Meier and Nelson-Aalen
+        estimators of survival
+    -   **survdiff** for comparing survival curves
+    -   and much more:)
+
+
+
+``` {r}
+library(survival)
+d=data.frame(entry_time=c(0,0,2,2,2),
+             exit_time=1:5,
+             event=c(1,0,1,0,1))
+with(d, Surv(exit_time)) # no censoring
+with(d, Surv(exit_time, event)) # right censoring
+with(d, Surv(entry_time, exit_time, event)) # left trucation and right censoring
+with(d, Surv(entry_time, exit_time, type="interval2")) # interval censoring
+```
+
+
+
+## Plots of event times without censoring or truncation {#plots-of-event-times-without-censoring-or-truncation beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+library(survival)
+time = c(11, 13, 13, 13, 13, 13, 14, 14, 15, 15, 17)
+par(mfrow=1:2) # graphics layout with 1 row and 2 columns
+## see also graphics::layout() or solutions using grid graphics
+plot(stats::ecdf(time), xlim=c(0,18))
+survival::survfit(survival::Surv(time)~1) |>
+    with({
+        plot(time, surv, type="p", pch=19, xlab="x", ylab="S(t)",
+             main="survfit(Surv(time)~1)", xlim=c(0,18), ylim=0:1)
+        segments(c(0,time), c(1,surv), x1=c(time,18))
+    })
+```
+
+
+
+## Reminder: Estimands, estimators and estimates
+
+-   An **estimand** is what we (conceptually) want to calculate -- which
+    often relates to our research question. An example is the proportion
+    of individuals who are alive at five years after study entry.
+-   An **estimator** is a calculation process (e.g. a formula or an
+    algorithm) to calculate an estimate. An example is the Kaplan-Meier
+    estimator for survival (that is, the formula).
+-   An **estimate** is the resulting calculation from applying an
+    estimator to some data. An example would be the \`\`estimated\'\'
+    five-year survival from a Kaplan-Meier estimator from a particular
+    study with follow-up to a specific date.
+-   We often need to consider how to interpret an estimator for a given
+    study design. (For example, an odds ratio estimate using a
+    conditional logistic regression estimator from a nested case-control
+    study with incidence density sampling can be interpreted as a hazard
+    ratio -- which may be the estimand of interest.)
+
+## Reminder: survival through a partition of time
+
+-   Partition the interval $(0,t]$ is divided into $m$ time intervals
+    with an index $j = 1,2,\ldots,m$, with times $t_j$, such that
+    $t_0=0 < t_1 < \cdots < t_m=t$.
+-   Then
+    $S(t) = \prod_{j=1}^m Pr(T>t_j|T\geq t_{j-1}) = \prod_{j=1}^m p_j$
+-   That is, survival across the interval is the product of the
+    conditional survival for each of the intervals $(t_{j-1},t_j]$
+-   This is the basic mechanism for both the life-table estimator and
+    the Kaplan-Meier estimator.
+
+## Life-table estimator of the survival function (Collett 2.1.1) {#life-table-estimator-of-the-survival-function-collett-2.1.1 beamer_opt="allowframebreaks,label="}
+
+-   Also known as the **actuarial estimator** of the survival function
+-   Follow-up is divided into $m$ time intervals with an index
+    $j = 1,2,\ldots,m$, with times $t_j$, such that
+    $t_0=0 < t_1 < \cdots < t_m=\infty$.
+-   Let $d_j$ be the number of events and $c_j$ be the number of
+    censored observations within the interval $[t_{j-1},t_j)$, with
+    $n_j$ at risk at the start of the interval (that is, at $t_{j-1}$).
+-   Mid-point approximation: assume that the censoring happens half-way
+    through the interval.
+-   Then we have an **adjusted number at risk** $n'_j=n_j-c_j/2$
+-   Then $Pr(T>t_j|T\geq t_{j-1})=1 - \displaystyle \frac{d_j}{n'_j}$
+
+
+
+-   And then the life-table estimator for survival is
+
+```{=latex}
+\begin{align*}
+  S^*(t) &= \prod_{i: t_i<t} Pr(T>t_i|T\geq t_{i-1}) \\
+  &= \prod_{i: t_i<t} \left(1-\frac{d_j}{n'_i}\right)
+\end{align*}
+```
+**Exercise: Discuss whether the actuarial estimates should be joined
+using linear interpolation or using a piecewise contant curve (steps).
+What are the advantages and disadvantages of each approach?**
+
+## R packages: collett and biostat3
+
+-   Datasets from the Collett book are provided by the publisher as .zip
+    file. With permission from the publisher and Professor Collett, I
+    have put a package **collett** onto CRAN.
+-   Reminder: \"CRAN\" is the Comprehensive R Archive Network, which is
+    the most common way to share R packages.
+-   It would be useful to further develop the **collett** package during
+    the course.
+    -   I have provided only basic documentation for some the datasets
+        in the package -- and this could be improved.
+    -   We could also add further examples from the book into the
+        package.
+    -   Code repo: <https://github.com/mclements/collett>
+
+``` {r}
+library(collett)
+## help (commented out)
+## ?collett::myeloma
+```
+
+-   We will also use datasets (and a few functions) from another R
+    package that I maintain: **biostat3**
+
+## Table 2.1 {#table-2.1 beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+library(biostat3) # lifetab2(), which adapts KM::lifetab() to use Surv()
+library(collett)  # myeloma
+actuarial = lifetab2(Surv(time,status)~1, data=collett::myeloma,
+                     breaks=c(seq(0,60,by=12), Inf))
+with(actuarial,
+     data.frame(period=paste0(tstart,"-"),
+                nevent,nlost,nsubs,nrisk,surv1=1-nevent/nrisk,surv))
+```
+
+
+
+## Figure 2.2 {#figure-2.2 beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+plot(actuarial, type="p", pch=19,
+     xlab="Survival time", ylab="Estimated survivor function",
+     ylim=0:1)
+lines(actuarial, type="s", lty=2)
+```
+
+
+
+## R: Semantics for pipes
+
+
+
+``` {r}
+library(magrittr) # %>%, %T>%
+## default pipes: replace first argument
+log(32,2) # standard function call
+32 |> log(2)  # internal pipe
+32 %>% log(2)
+##
+rbind(1:2,3:4) # standard function call: rbind(...)
+do.call(rbind, list(1:2,3:4)) # construct args from a list
+do.call(what=rbind, args=list(1:2,3:4)) # with named arguments
+list(1:2,3:4) |> do.call(what=rbind) # specify first => insert second
+list(1:2,3:4) |> do.call(rbind, args=_) # use _ with *named* arg
+list(1:2,3:4) %>% do.call(rbind, .) # . is more flexible
+##
+d = data.frame(x=0:10, y=seq(1,0,len=11))
+plot(d,type="s",lty=2); points(d,pch=19) # short:)
+d %T>% plot(type="s",lty=2) |> points(pch=19) # elegant
+tee <- function(x, f, ...) {
+    f(x, ...); invisible(x)
+}
+d |> tee(plot,type="s",lty=2) |> points(pch=19)
+```
+
+## Figure 2.2 with a finer time partition {#figure-2.2-with-a-finer-time-partition beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+library("magrittr")
+lifetab2(Surv(time,status)~1, data=collett::myeloma,
+         breaks=c(seq(0,60,by=3), Inf)) %T>%
+    plot(type="p", pch=19,
+         xlab="Survival time", ylab="Estimated survivor function",
+         ylim=0:1) |>
+    lines(type="s",lty=2)
+```
+
+
+
+## Kaplan-Meier estimator of the survival function (Collett 2.1.2) {#kaplan-meier-estimator-of-the-survival-function-collett-2.1.2 beamer_opt="allowframebreaks,label="}
+
+-   The **Kaplan-Meier estimator** is the most common approach to
+    estimating survival from right-censored time-to-event data.
+-   Consider the ordered distinct event times $t_{(j)}$.
+-   Let $n_j$ be the number at risk immediately before $t_{(j)}$.
+-   Let $d_j$ at the number of events at $t_{(j)}$.
+-   Assume that tied censored values at event time $t_{(j)}$ happen
+    immediately *after* the event.
+-   Then the Kaplan-Meier estimator is
+
+```{=latex}
+\begin{align*}
+  \hat{S}(t) &= \prod_{i: t_{(i)}<t} \left(1-\frac{d_i}{n_i}\right)
+\end{align*}
+```
+## Table 2.2 {#table-2.2 beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD, conf.type="none") |>
+    summary()
+```
+
+
+
+## Figure 2.4: Kaplan-Meier estimates of the survival function for the IUD dataset {#figure-2.4-kaplan-meier-estimates-of-the-survival-function-for-the-iud-dataset beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD) |>
+    plot(xlab="Discontinuation time",
+         ylab="Estimated survivor function",
+         conf.int=FALSE, ylim=0:1)
+```
+
+
+
+## Nelson-Aalen estimator of the cumulative hazard function (Collett 2.1.3) {#nelson-aalen-estimator-of-the-cumulative-hazard-function-collett-2.1.3 beamer_opt="allowframebreaks,label="}
+
+-   Under similar assumptions to the Kaplan-Meier estimator, we can
+    estimate the **cumulative hazard** to time $t$ using the
+    **Nelson-Aalen estimator**, such that
+
+```{=latex}
+\begin{align*}
+  \tilde{H}(t) &= \sum_{i: t_{(i)}<t} \frac{d_i}{n_i} \\
+  \tilde{S}(t) &= \exp\left(-\sum_{i: t_{(i)}<t} \frac{d_i}{n_i}\right) \\
+  &= \prod_{i: t_{(i)}<t} \exp\left(- \frac{d_i}{n_i}\right)
+\end{align*}
+```
+-   Based on the Taylor series expansion $\exp(-x)=1-x+x^2/2-o(x^3)$.
+    For $0 \leq x \ll 1$, we have that $\exp(-x) \geq 1-x$. This implies
+    that $\tilde{S}(t) \geq \hat{S}(t)$.
+-   Collett notes that the Nelson-Aalen estimator has lower bias than
+    the Kaplan-Meier estimator for small samples.
+-   Irrespectively, the Kaplan-Meier estimator is much more commonly
+    used than the Nelson-Aalen estimator.
+
+## Table 2.3: Nelson-Aalen estimates of the survival function for the IUD dataset {#table-2.3-nelson-aalen-estimates-of-the-survival-function-for-the-iud-dataset beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD, stype=2, conf.type="none") |>
+    summary()
+```
+
+
+
+## Comparison of the estimators of the survival function for the myeloma dataset {#comparison-of-the-estimators-of-the-survival-function-for-the-myeloma-dataset beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+par(mfrow=1:2)
+survfit(Surv(time,status)~1, data=collett::myeloma) |>
+    plot(xlab="Survival time", ylab="Estimated survivor function",
+         conf.int=FALSE, ylim=0:1, col=1)
+survfit(Surv(time,status)~1, data=transform(collett::myeloma,time=12*ceiling(time/12))) |>
+    lines(conf.int=FALSE, col=2)
+survfit(Surv(time,status)~1, stype=2,
+        data=transform(collett::myeloma,time=12*ceiling(time/12))) |>
+    lines(conf.int=FALSE, col=3)
+lifetab2(Surv(time,status)~1, data=collett::myeloma,
+         breaks=c(seq(0,90,by=12), Inf)) |>
+    lines(type="s", lty=2, col=4)
+legend("topright", legend=c("KM","KM (years)","NA (years)","LT (years)"),
+       lty=c(1,1,1,2), col=1:4, bty="n")
+##
+survfit(Surv(time,status)~1, data=collett::myeloma) |>
+    plot(xlab="Survival time", ylab="Estimated survivor function",
+         conf.int=FALSE, ylim=0:1, col=1)
+survfit(Surv(time,status)~1, stype=2, ctype=2, data=collett::myeloma) |>
+    lines(conf.int=FALSE, col=3)
+lifetab2(Surv(time,status)~1, data=collett::myeloma,
+         breaks=c(seq(0,90,by=1), Inf)) |>
+    lines(type="s", col=4, lty=2)
+legend("topright", legend=c("KM","NA","LT (month)"),
+       lty=c(1,1,2), col=c(1,3:4), bty="n")
+```
+
+
+
+## Reminder: delta method {#reminder-delta-method beamer_opt="allowframebreaks"}
+
+-   The **delta method** is one of the more useful tools in statistics.
+    For a random variable $\boldsymbol{X}$ and
+    $g : \mathbb{R}^n \rightarrow \mathbb{R}$, then by convention the
+    gradient $g'(\boldsymbol{X})$ is a column vector of length $n$ and
+    the variance of $g(\boldsymbol{X})$ can be approximated by
+
+```{=latex}
+\begin{align*}
+  \text{var}(g(\boldsymbol{X}))^T &\approx g'(\boldsymbol{X})^T \text{var}(\boldsymbol{X}) g'(\boldsymbol{X})
+\end{align*}
+```
+-   For $\boldsymbol{g} : \mathbb{R}^n \rightarrow \mathbb{R}^m$, then
+    by convention the Jacobian $\nabla \boldsymbol{g}(\boldsymbol{X})$
+    is a matrix with $m$ rows and $n$ columns and the variance of
+    $\boldsymbol{g}(\boldsymbol{X})$ can be approximated by
+
+```{=latex}
+\begin{align*}
+  \text{var}(\boldsymbol{g}(\boldsymbol{X})) &\approx \nabla\boldsymbol{g}(\boldsymbol{X}) \text{var}(\boldsymbol{X}) \nabla\boldsymbol{g}(\boldsymbol{X})^T
+\end{align*}
+```
+-   For a vector $\boldsymbol{g}$, we will obtain a variance-covariance
+    matrix, that includes the variances on the diagonal and covariance
+    terms on the off-diagonal.
+    -   If the vector transformation is long, then the
+        variance-covariance matrix can be very large and we can use a
+        short-cut to get at the variances on the diagonal:
+
+```{=latex}
+\begin{align*}
+  \text{diag}(\text{var}(\boldsymbol{g}(\boldsymbol{X}))) &\approx \left(\left(\nabla\boldsymbol{g}(\boldsymbol{X}) \text{var}(\boldsymbol{X})\right) \circ \nabla\boldsymbol{g}(\boldsymbol{X})\right) \boldsymbol{1}
+\end{align*}
+```
+where $\boldsymbol{M}_1 \circ \boldsymbol{M}_2$ represents the Hadamard
+(element-wise) product of matrices $\boldsymbol{M}_1$ and
+$\boldsymbol{M}_2$.
+
+-   For an example using a univariate random variable and univariate
+    transformation: for $g(X)=\log(X)$, then
+    $\text{var}(\log(X))\approx \text{var}(X)(g'(X))^2=\text{var}(X)/X^2$.
+
+-   The Jacobians/gradients can be calculated analytically or using
+    finite differences.
+
+## Variance for Kaplan-Meier estimator {#variance-for-kaplan-meier-estimator beamer_opt="allowframebreaks"}
+
+ For the Kaplan-Meier estimator $\hat{S}(t)$,
+
+```{=latex}
+\begin{align*}
+  \hat{S}(t) &= \prod_{j: t_{(j)}<t} \frac{n_j-d_j}{n_j} \\
+  \implies \log(\hat{S}(t)) &= \sum_{j: t_{(j)}<t} \log\left(\frac{n_j-d_j}{n_j}\right) \\
+  \implies \text{var}(\log(\hat{S}(t))) &= \sum_{j: t_{(j)}<t} \text{var}\left(\log\left(\frac{n_j-d_j}{n_j}\right))\right) \\
+  &\approx \sum_{j: t_{(j)}<t} \text{var}\left(\frac{n_j-d_j}{n_j}\right) / \left(\frac{n_j-d_j}{n_j}\right)^2 \\
+  &= \sum_{j: t_{(j)}<t} \frac{d_j(n_j-d_j)}{n_j^3} / \left(\frac{n_j-d_j}{n_j}\right)^2 \\
+  &= \sum_{j: t_{(j)}<t} \frac{d_j}{n_j(n_j-d_j)} \\
+\end{align*}
+```
+## Variance for Kaplan-Meier estimator
+
+-   Note that $\text{var}(\log(\hat{S}(t)))=\text{var}(\hat{H}(t))$,
+    which is the variance of the cumulative hazard.
+-   Again using the delta method, we have that
+
+```{=latex}
+\begin{align*}
+  \text{var}(\log(\hat{S}(t))) &\approx \text{var}(\hat{S}(t))/(\hat{S}(t))^2 \\
+  \implies \text{var}(\hat{S}(t)) &\approx (\hat{S}(t))^2 \text{var}(\log(\hat{S}(t))) \\
+  &\approx (\hat{S}(t))^2 \sum_{j: t_{(j)}<t} \frac{d_j}{n_j(n_j-d_j)}
+\end{align*}
+```
+-   This result is known as **Greenwood\'s formula**
+
+## Variances for the other estimators
+
+```{=latex}
+\begin{align*}
+  \text{var}(\log(S^*(t))) &\approx (S^*(t))^2 \sum_{j} \frac{d_j}{n_j'(n_j'-d_j)} \\
+  \text{var}(\log(\tilde{S}(t))) &\approx (\tilde{S}(t))^2 \sum_{j: t_{(j)}<t} \frac{d_j}{n_j^2}
+\end{align*}
+```
+## Confidence intervals
+
+-   For calculating confidence intervals, we would prefer a
+    transformation of survival that is symmetric and ensures values that
+    are between zero and 1.
+-   A common transformation is $\log(-\log(S))$. We already have an
+    estimate of $\text{var}(\log(\hat{S}))$, so again using our result
+    for $\text{var}(\log(X))$, we have that
+
+```{=latex}
+\begin{align*}
+  \text{var}(\log(-\log(\hat{S}(t)))) &\approx \text{var}(\log(\hat{S}(t))) / (\log(\hat{S}(t)))^2 \\
+  &= \frac{1}{(\log(\hat{S}(t)))^2} \sum_{j: t_{(j)}<t} \frac{d_j}{n_j(n_j-d_j)}
+\end{align*}
+```
+## Confidence intervals
+
+-   We can then use Wald-type confidence intervals on the transformed
+    scale:
+
+```{=latex}
+\begin{align*}
+  \log(-\log(\hat{S}(t))) \pm z_{1-\alpha/2} \sqrt{\text{var}(\log(-\log(\hat{S}(t))))}
+\end{align*}
+```
+where $z$ is a normal quantile for (e.g. $\alpha=0.05$).
+
+-   We can then back-transform to the survival scale
+
+```{=latex}
+\begin{align*}
+  \hat{S}(t)^{\exp\left(\pm z_{1-\alpha/2} \sqrt{\text{var}(\log(-\log(\hat{S}(t))))}\right)}
+\end{align*}
+```
+## Using the Maxima computer algebra software:
+
+``` {.maxima results="output raw" exports="both" eval="no"}
+delta_method(g,X,varX) := diff(g,X) * varX * diff(g,X)$
+tex(delta_method(log(-log(S)), S, varS));
+tex(delta_method(log(-logS), logS, varlogS));
+```
+
+$${{{\it varS}}\over{S^2\,\left(\log S\right)^2}}$$
+$${{{\it varlogS}}\over{{\it logS}^2}}$$
+
+## Confidence intervals based on conf.type=\"plain\" {#confidence-intervals-based-on-conf.typeplain beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD, conf.type="plain") |> summary()  
+```
+
+
+
+## Confidence intervals based on conf.type=\"log-log\" {#confidence-intervals-based-on-conf.typelog-log beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD, conf.type="log-log") |> summary()  
+```
+
+
+
+## Confidence intervals based on `conf.type`{.verbatim}\"log-log\"= {#confidence-intervals-based-on-conf.typelog-log-1 beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+survfit(Surv(time,status)~1, data=IUD, conf.type="log-log") |>
+    plot(xlab="Discontinuation time", ylab="Survival")
+```
+
+
+
+## Extension: survival estimation including left-truncation and right censoring
+
+-   This is a straightforward extension, as we simply change the risk
+    set and the **number at risk \$n~i~\$**.
+-   However, the interpretation of \"survival\" then becomes more
+    complex, as the estimator assumes that those at risk at a particular
+    time would be representative for a cohort that is followed from time
+    $0$.
+-   Moreover, if there are none at risk at an earlier time, then there
+    is **no risk** of an event -- which is a form of **immortal time
+    bias**.
+-   Finally, if there are very few at risk, then the estimator will be
+    imprecise, which will affect how to interpret the findings.
+-   We will return to these issues when we review the article by Lei et
+    al (2020).
+
+## Rate calculations: actuarial approach (Collett 2.3.1)
+
+-   For the actuarial approach, let $\tau_j$ be the width of the
+    $j\text{-th}$ time interval. Assuming a that the deaths on average
+    happen half-way through the interval, then the person-time at risk
+    is approximately $(n_j'-d_j/2)\tau_j$ and the hazard estimator is
+
+```{=latex}
+\begin{align*}
+  h^*(t) &= \frac{d_j}{(n_j'-d_j/2)\tau_j}
+\end{align*}
+```
+-   Assuming a **multinomial distribution**, Collett provides an
+    estimate of the variance [@gehan1969estimating]:
+
+```{=latex}
+\begin{align*}
+  \text{var}(h^*(t)) &= h^*(t)^2(1-(h^*(t)\tau_j)^2)/d_j
+\end{align*}
+```
+## Rate calculations assuming person-time and Poisson counts
+
+-   A more precise approach for interval $j$ is to report the overlaps
+    of individual follow-up with the interval splits to calculate
+    **person-time** $\text{PT}_j$. This neatly avoids the mid-point
+    approximations for the censored events and the deaths. We would then
+    have
+
+```{=latex}
+\begin{align*}
+  h^*(t) &= \frac{d_j}{\text{PT}_j}
+\end{align*}
+```
+-   Assuming that the counts $d_j$ are **Poisson distributed**, then
+    $E(d_j)=\text{var}(d_j)=d_j$ and $\text{var}(\log(d_j))=1/d_j$
+
+```{=latex}
+\begin{align*}
+  \text{var}(h^*(t)) &= \text{var}(d_j)/\text{PT}_j^2 = d_j^2\text{var}(\log(d_j)/\text{PT}_j^2 \\
+  &= d_j^2/d_j/\text{PT}_j^2 = h^*(t)^2/d_j
+\end{align*}
+```
+## Smoothing the Nelson-Aalen estimator (Collett 2.3.2; Aalen et al 2008, section 3.1.4) {#smoothing-the-nelson-aalen-estimator-collett-2.3.2-aalen-et-al-2008-section-3.1.4 beamer_opt="allowframebreaks,label="}
+
+-   The **hazard** can be estimated by smoothing the steps in the
+    Nelson-Aalen estimator.
+-   For distinct event times $t_{(j)}$, with number of events $d_j$ and
+    number at risk $n_j$, the smoothed hazard can be estimated by
+
+```{=latex}
+\begin{align*}
+  h^\dagger(t) &= \frac{1}{b}\sum_j K\left(\frac{t-t_{(j)}}{b}\right) \frac{d_j}{n_j} \\
+  &= \frac{1}{b}\sum_j K\left(\frac{t-t_{(j)}}{b}\right) \Delta\hat{H}(t_{(j)})
+\end{align*}
+```
+where $b$ is a **bandwidth** and the **kernel function** $K(x)$ is a
+bounded function that vanishes outside of $[-1,1]$ and has integral 1.
+
+
+
+-   Example kernels include:
+    -   **Epanechnikov** kernel $K(x) = \frac{3}{4} (1-x^2)$, which is
+        shown in Collett (2023)
+    -   **biweight** kernel $K(x)=\frac{15}{16} (1-x^2)^2$
+-   Importantly, the bandwidth $b$ needs to be selected.
+-   Since the increments in the Nelson-Aalen estimator are independent,
+    an estimate of the variance can be calculated by:
+
+```{=latex}
+\begin{align*}
+  \text{var}\left(h^\dagger(t)\right)
+  &= \frac{1}{b^2}\sum_j K\left(\frac{t-t_{(j)}}{b}\right)^2 \Delta\hat{\sigma}^2(t_{(j)}) \\
+  &= \frac{1}{b^2}\sum_j K\left(\frac{t-t_{(j)}}{b}\right)^2 \text{var}(\frac{d_j}{n_j}) \\
+  &= \frac{1}{b^2}\sum_j K\left(\frac{t-t_{(j)}}{b}\right)^2 \frac{d_j}{n_j^2}
+\end{align*}
+```
+## Exercise: exponential distribution
+
+-   An **exponential distribution** has a **constant hazard** $h$.
+-   What are the following quantities?
+    -   Cumulative distribution function
+    -   Survival function
+    -   Probability density function
+    -   Cumulative hazard
+    -   Quantile function $t(p)$, which is the time when a proportion
+        $p$ of individuals have experienced the event:
+
+```{=latex}
+\begin{align*}
+  t(p) &= \underset{t_i}{\text{min}}\{\hat{F}(t_i) \geq p\} \\
+  &= \underset{t_i}{\text{min}}\{\hat{S}(t_i) < 1-p\}
+\end{align*}
+```
+-   Assuming independence between individuals, for **person-time** PT,
+    what is the expected number of events? What distribution is expected
+    for the number of events?
+
+## Reminder: Kernel density estimation {#reminder-kernel-density-estimation beamer_opt="allowframebreaks,label="}
+
+-   Kernel density estimation is a closely related form where we seeking
+    to estimate the probability density function $f^\dagger(t)$ given a
+    sample $t_j$.
+
+```{=latex}
+\begin{align*}
+    f^\dagger(t) &= \frac{1}{b}\sum_j K\left(\frac{t-t_j}{b}\right) \frac{1}{n} \\
+\end{align*}
+```
+-   We see that we have replaced the weights $d_j/n_j$ with $1/n$.
+-   Automatic bandwidth estimation is difficult under general
+    conditions.
+-   One issue to be aware of is that a boundary in the data can bias the
+    estimated density. There are standard methods to reduce that bias.
+-   Hazard estimation is essentially a weighted form of kernel density
+    estimation.
+-   There are many methods and implementations for kernel density
+    estimation.
+    -   **stats::density()** is available from base R
+    -   **KernSmooth::bkde()** is a standard implementation
+
+ 
+
+``` {r}
+set.seed(12345)
+y = rexp(1e3) # exponential: constant hazard
+den1 = density(y)
+with(list(x=seq(0,10,length=401L)),
+     plot(x, dexp(x), lty=2, type="l",
+          xlab="Time", ylab="Density", main=""))
+with(den1, {
+    index = (x<0)
+    x = x[index]
+    polygon(c(x,rev(x)), c(y[index], x*0), col="grey", border="grey")
+    })
+lines(den1, col=2)
+legend("topright", legend=c("Truth","density(y)","Negative values"), lty=c(2,1,1), col=c("black","red","grey"), lwd=c(1,1,10))
+box()
+```
+
+
+
+``` {r}
+library(evmix)
+set.seed(12345)
+y = rexp(1e3) # exponential: constant hazard
+with(list(x=seq(0,10,length=401L)), {
+    plot(x, dexp(x), lty=2, type="l",
+         xlab="Time", ylab="Density", main="")
+    lines(x,dbckden(x,y,lambda=0.5),col=4)
+})
+lines(density(y,from=0),col=2)
+legend("topright", legend=c("Truth","density(y,from=0)","dbckden(x,y,lambda=0.5)"),
+       lty=c(2,1,1), col=c(1,2,3))
+```
+
+
+
+## Hazard estimation: standard implementations {#hazard-estimation-standard-implementations beamer_opt="allowframebreaks,label="}
+
+-   There is an old R package **muhaz** for hazard estimation of
+    right-censored data. It is not currently available on **webR**. A
+    wrapper for this is available from the **biostat3** package.
+
+-   The **bshazard** package allows for left truncation, right
+    censoring, and confidence interval estimation [@rebora2014bshazard].
+
+    
+
+
+
+``` {r}
+library(survival) # survfit()
+par(mfrow=c(1,1))
+set.seed(12345)
+data.frame(y=rexp(1e2)) |> # exponential: constant hazard
+    with(plot(survfit(Surv(y)~1),col=2,conf.int=FALSE,
+              xlab="Time", ylab="Survival"))
+data.frame(y=rexp(1e3)) |>
+    with(lines(survfit(Surv(y)~1),col=3,conf.int=FALSE))
+data.frame(y=rexp(1e4)) |>
+    with(lines(survfit(Surv(y)~1),col=4,conf.int=FALSE))
+with(list(x=seq(0,10,length=401L)), lines(x,exp(-x),lty=3))
+legend("topright",legend=c("KM, n=100","KM, n=1000","KM, n=10,000","truth"),
+       col=c(2,3,4,1),lty=c(1,1,1,3))
+```
+
+
+
+
+
+``` {r}
+library(biostat3) # muhaz2()
+library(bshazard) # bshazard()
+par(mfrow=c(1,3))
+set.seed(12345)
+d = data.frame(y=rexp(1e2),e=TRUE) # exponential: constant hazard
+plot(bshazard(Surv(y)~1,data=d,verbose=FALSE),col=2,ylim=c(0,2),
+     main="n=100")
+lines(muhaz2(Surv(y,e)~1, data=d), lty=2, col=3) # no confidence intervals
+abline(h=1,lty=3)
+## 
+d = data.frame(y=rexp(1e3),e=TRUE)
+plot(bshazard(Surv(y)~1,data=d,verbose=FALSE),col=2,ylim=c(0,2),
+     main="n=1000")
+lines(muhaz2(Surv(y,e)~1, data=d), lty=2, col=3) # no confidence intervals
+abline(h=1,lty=3)
+## 
+d = data.frame(y=rexp(1e4),e=TRUE)
+plot(bshazard(Surv(y)~1,data=d,verbose=FALSE),col=2,ylim=c(0,2),
+     main="n=10,000")
+lines(muhaz2(Surv(y,e)~1, data=d), lty=2, col=3) # no confidence intervals
+abline(h=1,lty=3)
+legend("bottomleft", legend=c("bshazard","muhaz","truth"), col=c(2,3,1),
+       lty=c(1,1,3), bty="n")
+
+```
+
+
+
+## Quantiles for survival
+
+-   Collett shows that
+
+```{=latex}
+\begin{align*}
+  \text{var}(t(p)) &= \text{var}(\hat{S}(t(p)))/\hat{f}(t(p))^2
+\end{align*}
+```
+-   For details, including how to calculate $\hat{f}(t(p))$ and the
+    variance of the quantile see Collett, sections 2.4-2.5.
+-   TODO: decide whether to (a) make this an exercise, (b) remove this
+    material or (c) add this material.
+
+## Exercise: when to look and when to test?
+
+-   Consider that you are the biostatistician on an observational study
+    for breast cancer patients (see the documentation for
+    `collett::bcancer`{.verbatim}).
+-   One of the investigators suggests that you assess whether staining
+    with *Helix pomatia* agglutinin is associated with improved
+    survival.
+-   What should you do **first**?
+    1.  Plot the survival curves for each group?
+    2.  Plot the hazard curves for each group?
+    3.  Formally test for a difference between the groups? (Let\'s
+        assume that we initially do *not* want to estimate a hazard
+        ratio.)
+    4.  Do something else? (If so: what?)
+
+## Comparison of two groups of survival data (Collett 2.6) {#comparison-of-two-groups-of-survival-data-collett-2.6 beamer_opt="allowframebreaks,label="}
+
+-   Is there evidence that the curves are different?
+
+
+
+``` {r}
+survfit(Surv(time,status)~stain, data=bcancer) |>
+    plot(xlab="Time (months)", ylab="Survival", col=1:2)
+legend("topright",
+       legend=c("Positive staining","Negative staining"),
+       col=1:2, lty=1)
+```
+
+
+
+
+
+``` {r}
+set.seed(54321)
+muhaz2(Surv(time,status)~stain, data=bcancer) |>
+    plot(xlab="Time (months)", ylab="Hazard", col=1:2, xlim=c(0,200))
+with(subset(bcancer, status==1 & stain==1),
+     rug(jitter(time)))
+with(subset(bcancer, status==1 & stain==2),
+     rug(jitter(time),col=2))
+```
+
+
+
+## Log-rank test (Collett 2.6.2) {#log-rank-test-collett-2.6.2 beamer_opt="allowframebreaks,label="}
+
+-   Consider that we have two groups: group I and group II
+-   Let the distinct times for the events be
+    $t_{(1)} < t_{(2)} < \cdots < t_{(r)}$ for $r$ distinct times across
+    the two groups.
+-   Extending our previous notation:
+    -   Let $d_{ij}$ be the number of events in group $i$ at time
+        $t_{(j)}$.
+    -   Let $n_{ij}$ be the number of at risk in group $i$ just before
+        time $t_{(j)}$.
+    -   We have $d_j=\sum_i d_{ij}$ and $n_j=\sum_i n_{ij}$.
+-   Our **null hypothesis** is that there is **no difference between the
+    two groups**.
+
+
+
+-   For each time $t_{(j)}$, we have the following table:
+
+
+
+  ------- ------------------ ------------------ -----------------------
+  Group   Number of deaths   Number surviving   Number at risk
+          at $t_{(j)}$       beyond $t_{(j)}$   just before $t_{(j)}$
+  I       $d_{1j}$           $n_{1j}-d_{1j}$    $n_{1j}$
+  II      $d_{2j}$           $n_{2j}-d_{2j}$    $n_{2j}$
+  Total   $d_j$              $n_j-d_j$          $n_j$
+  ------- ------------------ ------------------ -----------------------
+
+
+
+-   Assume that the column totals (the last row) and the row totals (the
+    last column) are **fixed**.
+-   Under the null hypothesis, the $d_{ij}$ have a **hypergeometric
+    distribution**.
+-   Consequently, the probability that the first cell will be $d_{1j}$
+    will be
+    $\binom{d_j}{d_{1j}}\binom{n_j-d_j}{n_{1j}-d_{1j}}/\binom{n_j}{n_{1j}}$.
+-   Moreover, the expected value of $d_{1j}$ under the null hypothesis
+    will be $e_{1j}=n_{1j} d_j/n_j$.
+-   To combine the observed and expected values across the distinct
+    event times, one approach is to simply sum:
+
+```{=latex}
+\begin{align*}
+  U_L &= \sum_{j=1}^r (d_{1j}-e_{1j})
+\end{align*}
+```
+-   Under the null hypothesis, $E(d_{1j})=e_{1j}$ and $E(U_L)=0$.
+    Further, as the event times are independent of each other (to be
+    shown:), then
+
+```{=latex}
+\begin{align*}
+  V_L = \text{var}(U_L) &= \sum_{j=1}^r \text{var}(d_{1j}-e_{1j}) = \sum_{j=1}^r \frac{n_{1j}n_{2j}d_{j}(n_{j}-d_{j})}{n_{j}^2(n_{j}-1)}
+\end{align*}
+```
+-   Under the null hypothesis, we then have that
+
+```{=latex}
+\begin{align*}
+  \frac{U_L^2}{V_L} &\sim \chi_1^2
+\end{align*}
+```
+that is, the ratio has a chi-squared distribution with one degree of
+freedom.
+
+## Example of the log-rank test {#example-of-the-log-rank-test beamer_opt="allowframebreaks,label="}
+
+
+
+``` {r}
+d = with(bcancer,
+     sort(unique(time[status==1])) |>
+     sapply(function(t)
+         c(d1j = sum(status==1 & stain==1 & time==t),
+           n1j = sum(stain==1 & time>=t),
+           n2j = sum(stain==2 & time>=t),
+           dj = sum(status==1 & time==t),
+           nj = sum(time>=t)))) |>
+    t() |>
+    as.data.frame() |>
+    transform(e1j = n1j*dj/nj,
+              v1j = n1j*n2j*dj*(nj-dj)/nj^2/(nj-1))
+with(d,  {
+    U = sum(d1j-e1j)
+    V = sum(v1j)
+    W = U^2/V
+    pval = pchisq(W,1,lower.tail=FALSE)
+    data.frame(UL=U,VL=V,WL=W,pval)
+})
+```
+
+
+
+``` {r}
+survdiff(Surv(time,status)~stain, data=bcancer)
+```
+
+
+
+## Wilcoxon test {#wilcoxon-test beamer_opt="allowframebreaks,label="}
+
+-   Log-rank test gives similar weights to each event.
+-   Wilcoxon test weights by the number at risk:
+    -   $U_W = \sum_{j=1}^r n_j(d_{1j}-e_{1j})$
+
+
+
+``` {r}
+with(d, {
+    U = sum(nj*(d1j-e1j)) # CHANGE
+    V = sum(v1j*nj^2) # CHANGE
+    W = U^2/V
+    pval = pchisq(W,1,lower.tail=FALSE)
+    data.frame(UW=U,VW=V,WW=W,pval)
+})
+```
+
+
+
+## Peto-Peto test {#peto-peto-test beamer_opt="allowframebreaks,label="}
+
+-   Wilcoxon test has been shown to be sensitive to different censoring
+    patterns between groups.
+-   Peto-Peto test weights by the Kaplan-Meier estimates of survival at
+    each time (combining the strata):
+    -   $U_P = \sum_{j=1}^r \hat{S}(t_{(j)}-)(d_{1j}-e_{1j})$
+    -   Note that we used survival at $t_{(j)}-$.
+
+
+
+``` {r}
+surv1 = survfit(Surv(time,status)~1,data=bcancer) |> summary() |>
+    with(c(1,head(surv,-1)))
+with(d, {
+    U = sum(surv1*(d1j-e1j)) # CHANGE
+    V = sum(surv1^2*v1j) # CHANGE
+    W = U^2/V
+    pval = pchisq(W,1,lower.tail=FALSE)
+    data.frame(UP=U,VP=V,WP=W,pval)
+})
+```
+
+
+
+``` {r}
+survdiff(Surv(time,status)~stain, data=bcancer, rho=1)
+```
+
+
+
+## Comparison of the log-rank, Wilcoxon and Peto-Peto tests (Collett 2.6.5)
+
+-   If **proportional hazards**, then prefer the log-rank test
+-   For other patterns, the Peto-Peto test is preferred (for details,
+    see Collett)
+
+## Comparison of three or more groups of survival data (Collett 2.7)
+
+-   Collett provides details on a multivariate generalisation of the
+    two-group tests.
+-   The test statistics have chi-squared distributions with $g-1$
+    degrees of freedom, where $g$ is the number of groups.
+-   For details, see Collett.
+
+## Stratified tests (Collett 2.8) {#stratified-tests-collett-2.8 beamer_opt="allowframebreaks,label="}
+
+-   It is common to have key covariates that associated with both
+    survival and the exposure of interest (e.g. age is often associated
+    with both).
+-   As a straightforward generalisation of these tests, we can calculate
+    **stratified tests**. Let the strata be indexed by $k$ with $s$
+    strata. Let the statistic for stratum $k$ be $U_k$ and let its
+    variance be $V_k$. Then a stratified test would be
+
+```{=latex}
+\begin{align*}
+  W_S &= \frac{\left(\sum_{k=1}^s U_k\right)^2}{\sum_{k=1}^s V_k}
+\end{align*}
+```
+``` {r}
+survdiff(Surv(time,status)~treatment+strata(age), data=collett::melanoma)
+```
+
+
+
+-   As a practitioner, I have never used this stratified test --
+    primarily because I generally prefer to model effect sizes rather
+    than perform tests. That said, I believe that the stratified tests
+    deserve more attention.
+
+**Exercise: show an R implementation of a stratified log-rank test and
+compare your calculations with the results in Collett exercise 2.15 in
+section 2.8.**
+
+## Brief review of R data types
+
+  Type                  Name        Values                    Comment
+  --------------------- ----------- ------------------------- ------------------------------------------------------------------------------------------
+  `num`{.verbatim}      numeric     1.0, -2.0e-5              Double precision. Assumes 1 is numeric
+  `int`{.verbatim}      integer     1L, 2L                    
+  `char`{.verbatim}     character   \"A\", \"1234\"           
+  `Factor`{.verbatim}   factor      \"A\", \"B\"              Categories with ordered levels
+  `Date`{.verbatim}     Date        as.Date(\"1969-08-01\")   Difference of dates is a `difftime`{.verbatim} -- convert using `as.numeric`{.verbatim}.
+
+## Variables in the colon carcinoma data set
+
+R code and output
+
+
+
+## Variables in the skin melanoma data set
+
+R code and output
+
+
+
+## Variables in the diet data set
+
+R code and output
+
+
+
+## Colon carcinoma 1985--94
+
+-   Codes for vital status with corresponding frequency counts 1985--94
+
+  Code and description             Male   Female
+  -------------------------------- ------ --------
+  0 Alive                          1476   2081
+  1 Dead: due to colon carcinoma   1806   2618
+  2 Dead: other cause of death     519    586
+  4 Lost to follow-up              1      0
+    Total                          3802   5285
+
+-   Note that the sample data sets also include patients diagnosed
+
+1975--1984.
+
+## Skin melanoma 1985--94 {#melanomadata}
+
+-   Codes for vital status with corresponding frequency counts 1985--94
+
+  Code and description             Male   Female
+  -------------------------------- ------ --------
+  0 Alive                          1554   1786
+  1 Dead: melanoma was the cause   543    376
+  2 Dead: other cause of death     238    247
+  4 Lost to follow-up              0      0
+    Total                          2335   2409
+
+-   Note that the sample data sets also include patients diagnosed
+
+1975--1984.
+
+## What has been left on the table?
+
+-   For this material, we have been informal in our approach.
+-   We have not shown formal assumptions (e.g. boundedness and other
+    regularity conditions).
+-   We have not shown that the event statistics at different times are
+    independent.
+-   We have not used Stieltjes integrals to allow for cumulative
+    distribution functions that include both steps and continuous
+    increases.
+-   Note: we will return to (most of) these considerations in later
+    teaching occasions.
+
+## Exercises
+
+-   See exercises Q1--4.
+-   Instructions for each are included in those questions.
+-   We will assign each group some of the questions to give a
+    walk-through for your answers.
+
+## Quiz
+
+1.  Define the hazard function in terms of probabilities for random
+    variable $T$ for (a) discrete time and (b) continuous time.
+2.  For continuous time: what is the formula for survival $S(t)$ to time
+    $t$ given the hazard $h(t)$?
+3.  Express the log-likelihood for the left truncated and potentially
+    right censored data tuple $(\delta_i,t_{0i},t_{1i})$ for event
+    indicator $\delta_i$, entry time $t_{t0i}$ and exit time $t_{1i}$ --
+    in terms of the hazard and the cumulative hazard.
+4.  What are **three** differences between the actuarial and
+    Kaplan-Meier estimators of survival?
+
+## Quiz: answers
+
+1.  In discrete time:
+
+```{=latex}
+\begin{align*}
+  h(t) = P(T=t|T \geq t) = \frac{P(T=t)}{P(T\geq t)}
+\end{align*}
+```
+In continuous time:
+
+```{=latex}
+\begin{align*}
+  h(t) & = \lim_{\delta \rightarrow 0} \frac{P(T \in [t,t+\delta) | T \geq t)}{\delta} = \lim_{\delta \rightarrow 0} \frac{P(T \in [t,t+\delta))}{\delta P(T\geq t)}
+\end{align*}
+```
+1.  Survival:
+
+```{=latex}
+\begin{align*}
+  S(t) = \exp\left(-\int_0^t h(u) du\right)
+\end{align*}
+```
+1.  Log-likelihood:
+
+```{=latex}
+\begin{align*}
+  l = \delta_i \log(h(t_{1i})) - H(t_{1i}) + H(t_{0i})
+\end{align*}
+```
+1.  The actuarial estimator has:
+    -   Pre-specified time intervals, whereas the Kaplan-Meier (KM)
+        estimator uses the distinct event times
+    -   The actuarial estimator adjusts the number at risk by
+        subtracting half of the number of censored (mid-point
+        approximation), whereas KM assumes that everyone is at risk
+    -   The KM estimator assumes that censored times that tie with an
+        event happen immediately after the event, whereas the actuarial
+        estimator considers censored values across the interval.
+        Arguably this is re-expressing the second point:\|.
+
+## References
+
+
+
+::: {#refs}
+:::
+
+

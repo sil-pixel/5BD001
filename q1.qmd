@@ -1,0 +1,160 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Mark Clements
+format:
+  html:
+    minimal: true
+filters:
+  - webr
+execute:
+  echo: true
+  message: false
+  cache: false
+  fig-width: 7
+  fig-height: 6
+---
+
+# Exercise 1: Life tables and Kaplan-Meier estimates of survival #
+
+- For this exercise, we will use an example dataset from the `biostat3` package on CRAN.
+- In outline, we will:
+  - Do hand calculations
+  - Implementation the Kaplan-Meier estimator in R
+  - Compare your findings with results from the `biostat3` and `survival` packages.
+  - Consider how to deal with left truncation.
+  - Finally: each group should be prepared to present and discuss their findings. Ideally, the presentation should use Rmarkdown or Quarto (especially the `webr` filter for Quarto) and HTML.
+
+- For the R code, you should generally restrict your attention to the R packages used in the course. Within your group, you can suggest the introduction of **one** further R package on CRAN for each exercise.
+
+- For course development:
+  - Please note (a) how long this exercise takes and (b) any suggested improvements for the exercise (e.g. errors, ambuiguities, or if the exercises are overly difficult or too simple).
+
+## (a) Hand calculation: Life table and Kaplan-Meier estimates of survival ##
+
+Using hand calculation (i.e., using a spreadsheet, pen and paper, or a calculator), estimate the cause-specific survival function for the sample of 35 patients diagnosed with colon carcinoma (see the table below) using both the Kaplan-Meier method (up to at least 30 months) and the actuarial method (at least the first 5 annual intervals).
+
+
+```{webr-r}
+#| autorun: true
+#| results: 'asis'
+library(knitr) # kable
+library(survival) # Surv, survfit
+library(biostat3) # colon_sample, lifetab2
+knitr::kable(biostat3::colon_sample, "html")
+```
+
+### Actuarial approach ###
+
+We suggest you start with the actuarial approach. Your task is to
+construct a life table with the following structure.
+
+
+| i | interval $[u,v)$ | $n_i$ | $d_i$ | $c_j$ | $n_j'$ | $p_j$ | $S(u)$ | $S(v)$ |
+|---|------------------|-------|-------|-------|--------|-------|--------|--------|
+| 1 | [0-1)            | 35    |       |       |        |       | 1.000  |        |
+| 2 | [1-2)            |       |       |       |        |       |        |        |
+| 3 | [2-3)            |       |       |       |        |       |        |        |
+| 4 | [3-4)            |       |       |       |        |       |        |        |
+| 5 | [4-5)            |       |       |       |        |       |        |        |
+| 6 | [5-6)            |       |       |       |        |       |        |        |
+
+
+We have already entered $n_j$ (the number of people alive) at the start
+of the first interval. The next step is to add the number who experienced
+the event  ($d_j$) and the number censored ($c_j$) during the interval.
+From $n_j$, $d_j$, and $c_j$ you will then be able to calculate $n_j'$
+(the effective number at risk), followed by $p_j$ (conditional probability
+of surviving the interval) and finally $S(v)$, the cumulative
+probability of surviving from time zero until the end of
+the interval.
+
+    
+### Kaplan-Meier approach ###
+
+To estimate survival using the Kaplan-Meier approach you may find it easiest to add a line to the table at each and every time there is an event or censoring (see below). We should use time in months. The first time at which there is an event or censoring is time equal to 2 months. The trick is what to do when there are both events and censorings at the same time.
+
+| time $t$ | # at risk | $d_j$ | $c_j$ | $p_j$ | $S(t)$ |
+|:---------|----------:|------:|------:|------:|-------:|
+| 0        |        -- |    -- |    -- |    -- |      1 |
+| 2        |        35 |       |       |       |        |
+| 3        |           |       |       |       |        |
+| 5        |           |       |       |       |        |
+| 7        |           |       |       |       |        |
+| 8        |           |       |       |       |        |
+| 9        |           |       |       |       |        |
+| 11       |           |       |       |       |        |
+| $\ldots$ |           |       |       |       |        |
+|          |           |       |       |       |        |
+|          |           |       |       |       |        |
+
+
+
+## (b) Write R code to implement the Kaplan-Meier estimator for those data
+
+- Implement an R function with signature `function(time,event)` that takes as input the observation time `time` and event indicator `event` and outputs a list with the event times and the Kaplan-Meier survival estimator for potentially right-censored data.
+- Extend the function to calculate the variance for log(survival).
+- Extend the function to calculate confidence intervals of survival on the $\log(survival)$ scale.
+
+```{webr-r}
+kaplan_meier = function(time, event) {
+	return NULL
+}
+```
+
+## (c) Using existing R functions to validate the calculations in (a) and (b)
+
+- Life tables are available using the `lifetab` function from the `KMsurv` package on CRAN. We have written a small wrapper `lifetab2` in the `biostat3` package which allows for a `Surv` object and a dataset. Using either of those functions, check your calculations of the actuarial estimator in (a).
+
+```{webr-r}
+library(biostat3)
+## biostat3::lifetab2(...)
+```
+
+- Print a summary and plot (using base graphics) the Kaplan-Meier estimator using the `survival` package. Interpret the form of the survival function and its confidence intervals.
+
+```{webr-r}
+library(survival)
+## survival::survfit(...)
+```
+
+
+- Investigate using the `survminer::ggsurvplot` function for `ggplot2`-based graphics of survival.
+
+```{webr-r}
+library(survminer)
+## survminer::ggsurvplot(...)
+```
+
+## (d) Left truncated data
+
+- We assume that person-time was not recorded in 1985-1986:
+
+```{webr-r}
+#| autorun: true
+#| results: 'asis'
+set.seed(12345)
+d = biostat3::colon_sample |>
+    transform(entry_mm=ifelse(yydx==1985,sample(13:24,35,replace=TRUE),
+                       ifelse(yydx==1986,sample(1:12,35,replace=TRUE),
+                              0)))
+## check that all of the entry dates are less than the survival times
+stopifnot(with(d, all(entry_mm<surv_mm)))
+## show the table
+kable(d, "html")
+```
+
+- Use `survfit` to calculate survival. How should we interpret this curve?
+
+```{webr-r}
+library(survival)
+## survival::survfit(...)
+```
+
+- Implement the Kaplan-Meier estimator for left truncated and right censored data as R code. Check that you get the same results as `survfit`.
+
+```{webr-r}
+kaplan_meier = function(entry_time, exit_time, event) {
+	return NULL
+}
+```
