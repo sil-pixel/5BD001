@@ -1,0 +1,190 @@
+---
+title: "BDS: Survival analysis with applications in medicine"
+author:
+- Code by Mark Clements
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+
+# Exercise 7. Model cause-specific mortality with Poisson regression #
+
+In this exercise, we will use Poisson regression to model cause-specific mortality of patients diagnosed with localised (stage 1) melanoma.
+
+In exercise 9, we will model cause-specific mortality using Cox regression and in exercise 28 we will use flexible parametric models. One aim is to illustrate that these three methods are very similar.
+
+-----------
+
+Load the melanoma dataset, restrict to localised cancer, and explore it.
+
+```{r}
+library(biostat3)
+melanoma.l = subset(biostat3::melanoma, stage=="Localised") |>
+    transform(death_cancer = as.numeric(status=="Dead: cancer"))
+head(melanoma.l)
+summary(melanoma.l)
+```
+
+## (a) ##
+### i. ###
+Plot Kaplan-Meier estimates of cause-specific survival by time since diagnosis by calendar period of diagnosis using `survminer::ggsurvplot`.
+
+```{r}
+```
+
+### ii. ###
+Plot the estimated hazard function (cause-specific mortality rate) by time since diagnosis by calendar period of diagnosis using `bshazard`. Is the interpretation (with respect to how prognosis depends on period) based on the hazard consistent with the interpretation of the survival plot?
+
+
+```{r}
+```
+
+## (b) ##
+Estimate the cause-specific mortality rate for each calendar period.
+
+```{r}
+```
+
+During which calendar period (the earlier or the later) is mortality the lowest? Is this consistent with what you found earlier? If not, why is there any inconsistency?
+
+## (c) ##
+The reason for the inconsistency between parts 7a and 7b was confounding by time since diagnosis. The comparison in part 7a was adjusted for time since diagnosis (since we compare the differences between the curves at each point in time) whereas the comparison in part 7b was not. 
+
+Two approaches for controlling for confounding are ‘restriction’ and ‘statistical adjustment’. We will first use restriction to control for confounding. We will restrict the potential follow-up time to a maximum of 120 months. Individuals who survive more than 120 months are censored at 120 months.
+
+### i. ###
+Estimate the cause-specific mortality rate for each calendar period by restriction.
+
+```{r}
+melanoma.l2 =
+    transform(melanoma.l,
+              ## Update the death indicator (only count deaths within 120 months)
+              ## death_cancer = death_cancer * as.numeric(surv_mm<=120),
+              death_cancer = ifelse(surv_mm<=120, status == "Dead: cancer",0),
+              ## Create a new time variable
+              surv_mm = pmin(surv_mm,120))
+```
+
+Calculate the rates for each diagnosis period:
+
+```{r}
+```
+
+During which calendar period (the earlier or the later) is mortality the lowest? Is this consistent with what you found in part 7b?
+
+### ii. ###
+Calculate the rate ratio (85–94/75–84) of the two mortality rates (i.e., a mortality rate ratio) and interpret the estimate (i.e., during which period is mortality higher/lower and by how much). Use `poisson.test()`.
+
+```{r}
+```
+
+### iii. ###
+Now use Poisson regression to estimate the same mortality rate ratio. Write the linear predictor and draw a graph of the fitted hazard rates.
+
+```{r}
+```
+
+## (7d) ##
+In order to adjust for time since diagnosis (i.e., adjust for the fact that we expect mortality to depend on time since diagnosis) we need to split the data by this timescale. We will restrict our analysis to mortality up to 10 years following diagnosis. To split the data, use either `survSplit` or `dplyr`, splitting by 12-month intervals by time from diagnosis.
+
+```{r}
+```
+
+## (e) ##
+Now tabulate and produce a graph of the rates by follow-up time.
+
+```{r}
+```
+
+Mortality appears to be quite low during the first year of follow-up. Does this seem reasonable considering the disease with which these patients have been diagnosed?
+
+## (f) ##
+Compare the plot of the estimated rates to a plot of the hazard rate as a function of continuous time.
+
+```{r}
+```
+
+Is the interpretation similar? Do you think it is sufficient to classify follow-up time into annual intervals or might it be preferable to use, for example, narrower intervals?
+
+## (g) ##
+Use Poisson regression to estimate incidence rate ratios as a function of follow-up time. Write out the regression equation.
+
+
+```{r}
+```
+
+Does the pattern of estimated incident rate ratios mirror the pattern you observed in
+the plots? Draw a graph of the fitted hazard rate using pen and paper.
+
+## (h) ##
+Now estimate the effect of calendar period of diagnosis while adjusting for the time since diagnosis. Before fitting this model, predict what you expect the estimated effect to be (i.e., will it be higher, lower, or similar to the value we obtained in part c). Write the regression equation and draw a graph of the fitted hazard rates.
+
+
+```{r}
+```
+
+Is the estimated effect of calendar period of diagnosis consistent with what you expected? Add an interaction between follow-up and calendar period of diagnosis and interpret the results.
+
+## (i) ##
+Now control for age, sex, and calendar period. Write the linear predictor.
+
+### i. ###
+Interpret the estimated hazard ratio for the first parameter for age group, including a comment on its statistical significance.
+
+### ii. ###
+Is there any empirical evidence that the effect of calendar period is confounded by age and sex? That is, does the inclusion of sex and age in the model change the estimate for the effect of calendar period?
+
+### iii. ###
+Perform a likelihood ratio test for the overall effect of age and interpret the results.
+
+```{r}
+```
+
+## (j) ##
+Is the effect of sex modified by calendar period (whilst adjusting for age and follow-up)? Fit an appropriate interaction term to test this hypothesis.
+
+```{r}
+```
+
+
+## (k) ##
+Based on the interaction model you fitted in exercise 7j, estimate the hazard ratio for the effect of sex (with 95% confidence interval) for each calendar period.
+
+```{r}
+```
+
+## (l) ##
+Now fit a **separate** model for each calendar period in order to estimate the hazard ratio for the effect of sex (with 95% confidence interval) for each calendar period.
+
+Why do the estimates differ from those you obtained in the previous part?
+
+```{r}
+```
+
+Can you fit a single model that reproduces the estimates you obtained from the stratified models?
+
+```{r}
+```
+
+## (m) ##
+Split by month and fit a model to smooth for time using natural splines, adjusting for age group and calendar period. Plot the baseline hazard. 
+
+```{r}
+```
+
+
+## (n) ##
+Split by month and fit a model to smooth for time using natural splines, adjusting for age group and calendar period, with a time-varying hazard ratio for calendar period. Plot the time-varying hazard ratio and a time-varying hazard difference. 
+
+```{r}
+```
+
+
+## (o) ##
+
+We can estimate survival from a Poisson regression model by integration. Using the `integrate` function and the `predict` function, calculate survival to 120 months for a patient aged 65 years diagnosed in 1986.
+
+```{r}
+```

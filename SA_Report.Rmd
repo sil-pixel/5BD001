@@ -1,0 +1,87 @@
+---
+title: "Survival Analysis with Applications in Medicine: Take-home examination"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+---
+
+## A. Weibull regression models
+
+### Q1. For a proportional hazards model with $S_0(t)$ that is a Weibull distribution, show that survival $S(t)$ is also from a Weibull distribution.
+
+Given a proportional hazards model with survival function $S(t | x) = S_0(t)^{\exp(\beta x)}$ for time $t$ and a given covariate $x$, 
+$S_0(t)$ is the baseline survival function, and $\beta$ is the log hazard ratio.
+
+We have the Weibull survival function $S_0(t) = \exp(-\lambda t^{k})$ for a scale parameter $\lambda$ and a shape parameter $k$.
+
+Substituting $S_0(t)$ in the proportional hazards model, we get the survival function as 
+
+$S(t | x) = \left[\exp(-\lambda t^{k})\right] ^ {\exp(\beta x)}$ 
+
+$S(t | x) = \exp(-\lambda t^{k} \exp(\beta x))$
+
+which is in form $S(t | x) = \exp(-\tilde\lambda_a t^{k})$ where $\tilde\lambda_a = \lambda \exp(\beta x)$ is the new scale parameter
+for the same shape parameter $k$.
+
+This means that the survival function $S(t|x)$ for a proportional hazards model is also from a Weibull distribution.
+
+Here, $S(t) = E_X[S(t \mid X)]$, which will also be from a Weibull distribution.
+
+### Q2. For an accelerated failure time model with $S_0(t)$ that is a Weibull distribution, show that survival $S(t)$ is also from a Weibull distribution.
+
+Given an accelerated failure time model with survival function $S(t | x) = S_0(t \exp(- \tilde\beta x))$ for time $t$ and 
+a given covariate $x$, $S_0(t)$ is the baseline survival function, and $\tilde\beta$ is the log time ratio.
+
+Substituting $S_0(t)$ in the accelerated failure time model, we get the survival function as
+
+$S(t | x) = \exp(-\lambda { \left ( t \exp(- \tilde\beta x) \right ) }^{k})$
+
+$S(t | x) = \exp(-\lambda t^{k} \exp(-k \tilde\beta x))$
+
+which is in form $S(t | x) = \exp(-\tilde\lambda_b t^{k})$ where $\tilde\lambda_b = \lambda \exp(-k \tilde\beta x)$ is the
+new scale parameter for the same shape parameter $k$.
+
+This means that the survival function $S(t|x)$ for an accelerated failure time model is also from a Weibull distribution.
+
+Similarly, $S(t) = E_X[S(t \mid X)]$, which will also be from a Weibull distribution.
+
+
+### Q3. What is the relationship between $\beta$ and $\tilde\beta$ if both models have a Weibull baseline survival function?
+
+For the proportional hazards model, we have $S(t | x) = \exp(-\lambda t^{k} \exp(\beta x))$.
+
+For the accelerated failure time model, we have $S(t | x) = \exp(-\lambda t^{k} \exp(-k \tilde\beta x))$.
+
+Comparing the two models, we get $\exp(\beta x) = \exp(-k \tilde\beta x)$.
+
+Taking the natural logarithm of both sides, we get $\beta x = -k \tilde\beta x$.
+
+Therefore, the relationship between $\beta$ and $\tilde\beta$ is $\beta = -k \tilde\beta$ if both models have a Weibull baseline survival function.
+
+---
+
+## B: Interval-censored likelihood
+
+---
+
+## C: Truncated distributions
+
+---
+
+## D: Cox’s partial likelihood with a time-varying effects 
+
+---
+
+## E: Data analysis of a randomised controlled trial for hormonal treatment of breast cancer patients in Germany
+
+---
+
+## F: Analysis plan for a randomised controlled trial
+
+---
