@@ -121,6 +121,7 @@ For interval-censored data, we can use the `Surv` function as `Surv(time, time2,
 Although, the `Surv` function doesn't support left truncation directly, we can filter out the left truncated data by taking the maximum of the entry time and the left truncation time.
 
 Here is an example of how to express left-truncated interval-censored data using the `Surv` function:
+
 ```{r}
 
 library(survival)
@@ -142,6 +143,127 @@ with(d, Surv(entry_time, exit_time, type="interval2"))
 
 ## C: Truncated distributions
 
+For a continuous random variable $T$, we have the survival function $S(t) = P(T > t)$. 
+
+Let the quantile function $Q(p)$ such that $Q(p) = S^{-1}(1-p) \Rightarrow 1-p = S(Q(p)) = P(T > Q(p))$.
+
+Assume that we have a truncated distribution with survival function $P(T > t| T > t_0)$ for left truncation time $t_0$.
+
+### Q1. Express the survival function for the truncated distribution in terms of the survival function for $T$.
+
+The survival function for the truncated distribution is given by: 
+
+$P(T > t| T > t_0)$
+
+$\Rightarrow \frac{P(T > t, T > t_0)}{P(T > t_0)}$ by definition of conditional probability.
+
+$\Rightarrow \frac{P(T > t)}{P(T > t_0)}$ because $T > t, T > t_0$ implies $T > t$ as $t_0$ is the left truncation time. 
+
+Since, $P(T > t) = S(t)$ and $P(T > t_0) = S(t_0)$ by the survival function for $T$, 
+
+the survival function for the truncated distribution is given by $\frac{S(t)}{S(t_0)}$.
+
+
+### Q2. For the truncated distribution, what is the quantile function $Q(p|t_0)$ that solves $P(T > t | T > t_0) = 1-p$ for $t$ in terms of the survival and quantile functions for $T$ at quantile (probability) $p$? 
+
+Given $P(T > t | T > t_0) = 1-p$,
+
+we know that $P(T > t | T > t_0) = \frac{S(t)}{S(t_0)} = 1-p$.
+
+Therefore, the quantile function $Q(p|t_0) = t$ that solves $P(T > t | T > t_0) = 1-p$:
+
+$S(t) = (1-p)S(t_0)$
+
+$\Rightarrow t = S^{-1}((1-p)S(t_0))$
+
+$\Rightarrow Q(p|t_0) = S^{-1}((1-p)S(t_0))$. 
+
+To solve for $S^{-1}((1-p)S(t_0))$, we know that $Q(p) = S^{-1}(1-p) \rightarrow Q(1-p) = S^{-1}(p)$.
+
+Hence, for a $y$, we can say that $S^{-1}(y) = Q(1-y)$,
+
+$\Rightarrow Q(p|t_0) = S^{-1}((1-p)S(t_0)) =  Q(1-(1-p)S(t_0))$.
+
+$\Rightarrow Q(p|t_0) = Q(1-(1-p)S(t_0))$.
+
+i.e., the $p$-th quantile of left truncated distribution is the ($1 - (1-p)S(t_0)$)-th quantile of the original distribution.
+
+
+### Q3. Using this algorithm, write, run and report on R code to calculate the 0.4 quantile from a truncated log-normal distribution where $T \sim LogNormal(\mu = 1, \sigma^2 = 1.2^2)$ for a log-normal distribution with mean $\mu$ and standard deviation $\sigma$ on the log scale for $t_0 = 2$.
+
+We can derive the quantile function $Q(p= 0.4|t_0 = 2)$ as follows:
+
+$Q(p|t_0) = Q(1 - (1-p)S(t_0))$.
+
+To derive $S(t_0)$, we know that $S(t_0) = P(T > t_0) = 1 - P(T \leq t_0) = 1 - F(t_0)$,
+
+where $F(t)$ is the cumulative distribution function for $T$.
+
+For a log-normal distribution of $T$, we can compute $S(t_0)$ using `plnorm` function in R.
+
+Then, we can substitute the $S(t_0)$ value back to $Q(1 - (1-p)S(t_0))$ and compute the quantile using `qlnorm` function in R for the probability $p = 0.4$.
+
+```{r}
+#' @param p is the probability
+#' @param meanlog mean on the log scale
+#' @param sdlog standard deviation on the log scale
+#' #' @param t0 left truncation time
+#' @return the quantile from a truncated log-normal distribution
+
+f = function(p, meanlog, sdlog, t0) {
+  S2 = 1 - plnorm(t0, meanlog, sdlog)
+  Q = qlnorm(1 - (1-p)*S2, meanlog, sdlog)
+  return(Q)
+}
+
+# function call
+f(p = 0.4, meanlog = 1, sdlog = 1.2, t0 = 2)
+
+```
+
+Hence, the 0.4 quantile from a truncated log-normal distribution with $T \sim LogNormal(\mu = 1, \sigma^2 = 1.2^2)$ for $t_0 = 2$ is approximately 4.172.
+
+### Q4. Check your value of the 0.4 quantile from the truncated log-normal distribution in question C3 by given random sampling code. 
+
+Given `R` code to return a vector of random numbers $t$ sampled from a truncated log-normal distribution:
+
+```{r}
+#' @param n the number of random numbers
+#' @param meanlog mean on the log scale
+#' @param sdlog sd on the log scale
+#' @param t0 left truncation time(s)
+#' @return vector of random numbers drawn from a truncated log-normal distribution
+rtrunc_lnorm = function(n, meanlog, sdlog, t0) {
+    y = rlnorm(n, meanlog, sdlog)
+    while (any(y<t0))
+        y[y<t0] = rlnorm(n, meanlog, sdlog)[y<t0]
+    y
+}
+```
+
+Now, let's try to compute the 0.4 quantile for the above random numbers using the `quantile` function in R for large sample sizes of $n = 10,000$ and $n = 100,000$.
+
+```{r}
+# set seed for reproducibility
+set.seed(123)
+
+# generate 10,000 random numbers from truncated log-normal distribution
+y = rtrunc_lnorm(n = 10000, meanlog = 1, sdlog = 1.2, t0 = 2)
+
+# calculate the 0.4 quantile
+quantile(y, 0.4)
+
+# generate 100,000 random numbers from truncated log-normal distribution
+y = rtrunc_lnorm(n = 100000, meanlog = 1, sdlog = 1.2, t0 = 2)
+
+# calculate the 0.4 quantile
+quantile(y, 0.4)
+
+```
+
+We can see that the 0.4 quantile is approximately 4.149 and 4.165 by randomly sampling $t$ values from a truncated log-normal distribution of $T$ for $n = 10,000$ and $n = 100,000$ respectively. This is very close to the value of 4.172 obtained from the algorithm in question C3.
+
+
 ---
 
 ## D: Cox’s partial likelihood with a time-varying effects 
@@ -156,6 +278,8 @@ with(d, Surv(entry_time, exit_time, type="interval2"))
 
 ---
 
+I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to auto-complete my explanations.
 
 
-This assignemt took me approximately 4 hours to complete.
+This assignment took me approximately 7 hours to complete.
+
