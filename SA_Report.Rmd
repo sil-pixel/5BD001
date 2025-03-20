@@ -268,6 +268,102 @@ We can see that the 0.4 quantile is approximately 4.149 and 4.165 by randomly sa
 
 ## D: Cox’s partial likelihood with a time-varying effects 
 
+### Q1. Let the right censored data tuple $(t_i, \delta_i, x_i(.))$ for individual $i \in \{1, 2, ..., n\}$, with follow-up from time 0 to time $t_i$, event indicator $\delta_i$ (with value 1 if the event is observed at time $t_i$, otherwise censored with value 0), and time-varying effects $x_i(t)$. Let the time-varying hazard ratio be $exp(x_i(t)^{T} \beta)$ for regression coefficients $\beta$. Let the risk set $R(t_i)$ be the set of individuals $\{j : t_j \geq t_i\}$. Assume that there are no tied event times. Write out the partial likelihood $L(\beta)$. 
+
+The cox proportional hazards model has the hazard at time $t$ given time-varying covariates $x(t)$ as 
+
+$h(t|x) = exp(x(t)^{T} \beta) h_0(t)$, where $h_0(t)$ is the baseline hazard function.
+
+The partial likelihood function $L(\beta)$ is the product over all individuals who experience an event ($\delta_i = 1$) of the conditional probability that that particular individual experiences the event at time $t_i$, given that the event occurs at that time within the risk set $R(t_i)$.
+
+For an individual $i$ who experiences an event at time $t_i$, the conditional probability is given by the ratio of their hazard to the sum of the hazards of all individuals in the risk set at time $t_i$:
+
+$\frac{h_i(t_i|x_i)}{\sum_{j \in R(t_i)} h_j(t_i|x_i)}$
+
+Substituting the above form of the hazard function, the baseline hazard $h_0(t_i)$ cancels out from the numerator and the denominator:
+
+$\frac{exp(x_i(t_i)^{T} \beta) h_0(t_i)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta) h_0(t_i)} = \frac{exp(x_i(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)}$.
+
+Hence, the partial likelihood function $L(\beta)$ is the product of these conditional probabilities over all individuals for whom an event is observed: 
+
+$L(\beta) = \prod_{i=1}^{n} \left ( \frac{exp(x_i(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)} \right)^{\delta_i}$
+
+Note that the $x_j$ in the denominator are evaluated at time $t_i$ .
+
+### Q2. Analytically derive the gradient (or score) $\frac{d\log(L)}{d\beta_k}$.
+
+The log partial likelihood function is given by:
+
+$\log(L(\beta)) = \sum_{i=1}^{n} \delta_i \left ( x_i(t_i)^{T} \beta - \log \left ( \sum_{l \in R(t_i)} exp(x_l(t_i)^{T} \beta) \right ) \right)$.
+
+The gradient of the log partial likelihood function with respect to the $k$-th element of $\beta$ is:
+
+$\frac{d\log(L)}{d\beta_k} = \sum_{i=1}^{n} \delta_i \left ( x_{ik}(t_i) - \frac{\sum_{l \in R(t_i)} x_{lk}(t_i) exp(x_l(t_i)^{T} \beta)}{\sum_{l \in R(t_i)} exp(x_l(t_i)^{T} \beta)} \right)$.
+
+where $x_{ik}(t_i)$ is the $k$-th element of the time-varying effects vector $x_i(t_i)$ for individual $i$ and 
+
+$x_{lk}(t_i)$ is the $k$-th element of the time-varying effects vector $x_l(t_i)$ for individual $l$ in the risk set $R(t_i)$ at time $t_i$.
+
+
+### Q3. Let a binary exposure be defined by $z_i$ for individual $i$ and let $x_i(t) = (z_i, z_i t)^T$. Write out a formula for the hazard ratio as a function of time $t$ for those exposed compared with those not exposed.
+
+Considering an exposure $z_i$, the hazard function for an individual $i$ is given by:
+
+$h_i(t|x_i) = exp(x_i(t)^{T} \beta) h_0(t)$.
+
+$\Rightarrow exp(z_i \beta_1 + z_i t \beta_2) h_0(t)$.
+
+The hazard ratio at time $t$ for those exposed ($z_i = 1$) compared with those not exposed ($z_i = 0$) is given by:
+
+$\frac{h_i(t|x_i = (1, t)^T)}{h_i(t|x_i = (0, 0)^T)} = \frac{exp(\beta_1 + t \beta_2) h_0(t)}{exp(0) h_0(t)} = exp(\beta_1 + t \beta_2)$.
+
+### Q4. The following code is used to investigate whether the hazard ratio between distant and localised cancer varies by time. Write out the regression model and carefully interpret the four parameters. 
+
+Given the following code:
+
+```{r warning=FALSE, message=FALSE}
+library(survival)
+library(biostat3)
+transform(biostat3::colon, stage=relevel(stage,"Localised")) |>
+    coxph(Surv(surv_mm,status=="Dead: cancer")~stage+tt(stage), data=_,
+          tt=function(x,t,...) (x=="Distant")*t/12) |>
+    summary()
+```
+
+From the above code, the cox regression model being fitted can be written as: 
+
+$\mathbf{h(t| stage) = h_0(t) exp(\beta_1 \times stageUnknown + \beta_2 \times stageRegional + \beta_3 \times stageDistant + \beta_4 \times tt(stage))}$.
+
+where $h(t| stage)$ is the hazard function at time $t$ given the stage of cancer, $h_0(t)$ is the baseline hazard function, and $\beta_1, \beta_2, \beta_3, \beta_4$ are the regression coefficients for the stage of cancer.
+
+The model includes three stages of cancer, such as Unknown, Regional, Distant, and a time-varying effect `tt(stage)`, defined as $(x == Distant) \times t/12$, which is only applicable when the stage is Distant. 
+
+Here, Localised is the reference level for the stage of cancer.
+
+The four parameters in question are:
+
+ - $\beta_1$: The log hazard ratio between the Unknown stage and the Localised stage of cancer. 
+ - $\beta_2$: The log hazard ratio between the Regional stage and the Localised stage of cancer.
+ - $\beta_3$: The log hazard ratio between the Distant stage and the Localised stage of cancer at $t=0$.
+ - $\beta_4$: The time-dependent change in the log hazard ratio between the Distant stage and the Localised stage of cancer per year. 
+ 
+The p-value of each parameter is a very small value, much less than 0.05, indicating that the parameters are all statistically significant. This means that all stages of cancer have a significant impact on the hazard of death from cancer compared to the Localised stage. 
+
+The time-varying effect for the Distant stage is also significant, indicating that the hazard ratio between Distant and Localised cancer varies over time.
+
+
+Let us interpret these parameters using the hazard ratios mentioned in the summary:
+
+ - Patients with Unknown stage cancer have $exp(\beta_1) \sim$ **2.56** times higher risk of death from cancer compared to patients with Localised stage cancer.
+ - Patients with Regional stage cancer have $exp(\beta_2) \sim$ **2.23** times higher risk of death from cancer compared to patients with Localised stage cancer.
+ - Patients with Distant stage cancer have $exp(\beta_3) \sim$ **9.20** times higher risk of death from cancer compared to patients with Localised stage cancer.
+ - The hazard for Distant stage cancer decreases over time at a rate of $1 - exp(\beta_4) \sim 1- 0.88 = 0.12$, meaning approximately a **12%** reduction in hazard per year.
+ 
+The 95% confidence interval for the hazard ratio of time varying effect is (0.86, 0.91), which indicates that the hazard for Distant stage cancer decreases by approximately 9% to 14% per year compared to Localised stage cancer with 95% confidence.
+
+
+
+
 ---
 
 ## E: Data analysis of a randomised controlled trial for hormonal treatment of breast cancer patients in Germany
