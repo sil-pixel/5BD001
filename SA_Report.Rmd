@@ -294,15 +294,15 @@ Note that the $x_j$ in the denominator are evaluated at time $t_i$ .
 
 The log partial likelihood function is given by:
 
-$\log(L(\beta)) = \sum_{i=1}^{n} \delta_i \left ( x_i(t_i)^{T} \beta - \log \left ( \sum_{l \in R(t_i)} exp(x_l(t_i)^{T} \beta) \right ) \right)$.
+$\log(L(\beta)) = \sum_{i=1}^{n} \delta_i \left ( x_i(t_i)^{T} \beta - \log \left ( \sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta) \right ) \right)$.
 
 The gradient of the log partial likelihood function with respect to the $k$-th element of $\beta$ is:
 
-$\frac{d\log(L)}{d\beta_k} = \sum_{i=1}^{n} \delta_i \left ( x_{ik}(t_i) - \frac{\sum_{l \in R(t_i)} x_{lk}(t_i) exp(x_l(t_i)^{T} \beta)}{\sum_{l \in R(t_i)} exp(x_l(t_i)^{T} \beta)} \right)$.
+$\frac{d\log(L)}{d\beta_k} = \sum_{i=1}^{n} \delta_i \left ( x_{ik}(t_i) - \frac{\sum_{j \in R(t_i)} x_{jk}(t_i) exp(x_j(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)} \right)$.
 
 where $x_{ik}(t_i)$ is the $k$-th element of the time-varying effects vector $x_i(t_i)$ for individual $i$ and 
 
-$x_{lk}(t_i)$ is the $k$-th element of the time-varying effects vector $x_l(t_i)$ for individual $l$ in the risk set $R(t_i)$ at time $t_i$.
+$x_{jk}(t_i)$ is the $k$-th element of the time-varying effects vector $x_j(t_i)$ for individual $j$ in the risk set $R(t_i)$ at time $t_i$.
 
 
 ### Q3. Let a binary exposure be defined by $z_i$ for individual $i$ and let $x_i(t) = (z_i, z_i t)^T$. Write out a formula for the hazard ratio as a function of time $t$ for those exposed compared with those not exposed.
@@ -377,5 +377,5 @@ The 95% confidence interval for the hazard ratio of time varying effect is (0.86
 I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to auto-complete my explanations.
 
 
-This assignment took me approximately 7 hours to complete.
+This assignment took me approximately 10 hours to complete.
 
