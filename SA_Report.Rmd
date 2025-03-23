@@ -503,10 +503,56 @@ In conclusion, the graphical evaluation of the Schoenfeld residuals against time
 
 ## F: Analysis plan for a randomised controlled trial
 
+### Q1. Write an outline of how to analyse this study. The outline should include: the estimand of interest; the estimator for that estimand; how you will assess potential confounding; how you will model for potential confounding; whether and how to assess for proportional hazards; and a description of the tables and figures used for reporting. Your analysis plan should provide some motivation for your choices.
+
+For the research question of *Does low-dose aspirin improve survival for patients diagnosed with colorectal cancer with a particular genetic signature?*, we are interested in estimating the causal effect of low-dose aspirin on the survival of patients with a particular genetic signature diagnosed with colorectal cancer over five years of follow-up.
+
+### Analysis Plan:
+
+- **Estimand of Interest:** Hazard Ratio comparing the cause-specific death due to colorectal cancer between the experimental arm (low-dose aspirin) and the control arm (no low-dose aspirin) for patients with a particular genetic signature. Hazard ratio less than 1 indicates a beneficial effect of low-dose aspirin on survival.
+
+- **Estimator:** The primary estimator for hazard ratio is Cox proportional hazards model, which is suitable for time-to-event data, can adjust for potential confounders, handle censoring data and assess the effect of low-dose aspirin on cause-specific death due to colorectal cancer. It does not require assumption about underlying survival distribution and can model time-varying covariates.
+
+- **Assessment of Potential Confounding:** Potential confounding can be modelled by adjusting for covariates that are associated with both the treatment and the outcome. Confounders may include age, sex, cancer stage, and other variables that can potentially influence the effect of low-dose aspirin on survival.
+
+- **Modeling for Potential Confounding:** We will adjust for potential confounders by including them as covariates in the Cox regression model. The regression model will look like: 
+
+$h(t| aspirin, X) = h_0(t) exp(\beta \times aspirin + \gamma \times X)$, 
+
+where $h(t| aspirin, X)$ is the hazard function at time $t$ given aspirin treatment and covariates $X$, such as age, sex, etc.
+$h_0(t)$ is the baseline hazard function for no aspirin treatment and the reference levels of all the covariates, $\beta$ is the regression coefficient for aspirin treatment, and $\gamma$ are the regression coefficients for covariates $X$.
+
+By adjusting for confounders, we want to estimate the total effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other factors that may confound the relationship.
+
+- **Assessment for Proportional Hazards:** We will assess the proportional hazards assumption using the Schoenfeld residuals test. We can test for proportional hazards by examining the scaled Schoenfeld residuals against time. A non-significant p-value indicates that the proportional hazards assumption holds. If the proportional hazards assumption is violated, we will consider time-varying effects as a part of the model.
+
+- **Tables and Figures for Reporting:**
+  - **Table 1:** Descriptive statistics of the study population, including baseline characteristics by treatment arm. This table will include the summary of patient demographics, cancer stage, and other relevant covariates, to help understand the characteristics of the study population.
+  - **Table 2:** Results of the Cox regression model, including hazard ratio, 95% confidence interval, and p-value for the effect of low-dose aspirin on cause-specific death due to colorectal cancer. This summary will show us the individual hazard ratios of each of the potential confounders conditional on the other covariates and their significance level in the model.
+  - **Figure 1:** Kaplan-Meier curves for the experimental and control arms, showing the survival probability over time. This will help us visualize the difference in survival between the two arms, and assess the effect of low-dose aspirin on survival on a high level.
+  - **Figure 2:** Schoenfeld residuals plot to assess the proportional hazards assumption. This plot will help us evaluate whether the hazard ratio for low-dose aspirin is constant over time, and whether time varying effects need to be considered in the model.
+
+Hence, with the help of the Cox proportional hazards model, we can estimate the causal effect of low-dose aspirin on cause-specific death due to colorectal cancer, while adjusting for potential confounders and assessing the proportional hazards assumption.
+
+
+### Q2. Finally, discuss whether non-collapsibility is an issue for the chosen estimator. 
+
+Yes, non-collapsibility can be an issue for the chosen estimator, the Cox proportional hazards model. Hazard ratio in Cox proportional hazards model is a non-collapsible measure of association. This means that the marginal hazard ratio, i.e., the hazard ratio seen when not conditioned on any other variables, can be different from the conditional hazard ratio, i.e., the hazard ratio seen when conditioned on other variables. This can be seen even when the other variables are not confounders. 
+
+We see conditional hazard ratio in the Cox model, since hazard function is defined as: 
+
+$h(t| aspirin, X) = h_0(t) exp(\beta \times aspirin + \gamma \times X)$.
+
+In the context of the study, non-collapsibility can be an issue if we are interested in the marginal effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other covariates, such as the patient's age, sex and their stage of cancer. The conditional hazard ratio estimated by the Cox model may not represent the marginal effect of low-dose aspirin on survival. 
+
+The marginal estimands are useful for representing the causal effect of the treatment on the outcome across a population, while the conditional estimands are useful for understanding the effect of the treatment within a specific subgroup, such as patients with a particular age group or cancer stage.
+
+We can address the non-collapsibility by using regression standardisation to calculate the marginal effect, which can provide a better interpretative measure of the effect of low-dose aspirin from the conditional model. This method can help us estimate the average causal effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other covariates.
+
 ---
 
-I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to auto-complete my explanations.
+I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to improve my summarization and writing skills.
 
 
-This assignment took me approximately 13.5 hours to complete.
+This assignment took me approximately 16 hours to complete.
 
