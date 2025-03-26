@@ -360,7 +360,7 @@ The 95% confidence interval for the hazard ratio of time varying effect is (0.86
 
 ### Q1. Plot the Kaplan-Meier curves by randomisation arm, including a legend and appropriate axis labels. Carefully describe the pattern.
 
-To focus on the effect of recurrence in the hormonal therapy with follow-up time rectime and recurrence status indicated by censrec (1 = recurrence, 0 = censored), first we plot the kaplan-meier curves by randomisation arm.
+To focus on the effect of recurrence in the hormonal therapy with follow-up time rectime and recurrence status indicated by censrec (1 = recurrence, 0 = censored), first we plot the kaplan-meier curves with solely the binary variable hormon (1 = hormonal therapy, 0 = no hormonal therapy) by randomisation arm.
 
 ```{r, warning=FALSE, message=FALSE}
 # Load the data
@@ -408,42 +408,67 @@ The hormonal therapy arm shows a consistently higher survival probability compar
 
 To fit a Cox regression model adjusting for hormonal treatment, we consider the following regression model:
 
-$h(t| hormon) = h_0(t) exp(\beta \times hormon)$
+$h(t| hormon, X) = h_0(t) exp(\beta \times hormon + \gamma \times X)$
 
-where $h(t| hormon)$ is the hazard function at time $t$ given hormonal treatment, $h_0(t)$ is the baseline hazard function (for the reference group: $hormon = 0$), $hormon$ is the indicator variable for hormonal therapy where $hormon=1$ if patient has received hormonal therapy and $hormon=0$ otherwise and $\beta$ is the regression coefficient for hormonal treatment.
+where $h(t| hormon, X)$ is the hazard function at time $t$ given hormonal treatment and list of covariates, such as, age, menopausal status, tumour information, $h_0(t)$ is the baseline hazard function, $hormon$ is the indicator variable for hormonal therapy, $\beta$ is the regression coefficient for hormonal treatment, $X$ is the vector of covariates and $\gamma$ is the vector of regression coefficients for covariates.
 
-The Cox regression model is fitted as follows:
+We will compare the model performance with all covariates and a reduced model with only the hormonal treatment variable.
+
+The Cox regression model with all the given variables in the dataset is as follows:
 
 ```{r, warning=FALSE, message=FALSE}
 
-# Fit the Cox regression model
-cox_model <- coxph(Surv(rectime, censrec) ~ hormon, data = brcancer)
-
-# Display the summary of the model
-summary(cox_model)
+# Fit the Cox regression model with all covariates
+cox_model_all <- coxph(Surv(rectime, censrec) ~ hormon + x1 + x2 + x3 + x4 
+                       + x4a + x4b + x5 + x5e + x6 + x7, data = brcancer)
+summary(cox_model_all)
 ```
-The Cox regression model estimates the hazard ratio ($\psi$) for hormonal treatment compared to no hormonal treatment. The estimand of choice is the hazard ratio, which represents the relative risk of recurrence for patients receiving hormonal treatment compared to those not receiving hormonal treatment. This is equivalent to the exponential of the regression coefficient $\beta$ in the Cox regression model.
+
+The Cox regression model with all covariates suggests that hormonal treatment, the decaying exponential function of number of positive nodes and progesterone receptor level are significantly associated with the risk of breast cancer recurrence from their p-values. The concordance index is 0.698, indicating that the model has moderate predictive accuracy. The likelihood ratio test, Wald test, and Score test all have p-values much less than 0.05, indicating that the model is statistically significant.
+
+Now, let's look at the Cox regression model with only hormonal treatment:
+```{r, warning=FALSE, message=FALSE}
+# Fit the Cox regression model with only hormonal treatment
+cox_model_basic <- coxph(Surv(rectime, censrec) ~ hormon, data = brcancer)
+summary(cox_model_basic)
+```
+The concordance index is 0.543, indicating that the model has poor predictive accuracy, almost as the same as random guessing.
+The likelihood ratio test, Wald test, and Score test all have p-values less than 0.05, indicating that the model is statistically significant. These values are not as good as the model with all covariates.
+
+Now, let's fit an optimized Cox regression model with hormonal treatment and the statistically significant covariates $x5e$, $x6$ from the all covariates model:
+
+```{r, warning=FALSE, message=FALSE}
+cox_model_optm <- coxph(Surv(rectime, censrec) ~ hormon + x5e + x6, data = brcancer)
+summary(cox_model_optm)
+```
+Here, the concordance index is 0.685, which is better than the basic model with only hormonal treatment and pretty close to the model with all covariates. This indicates that this model has moderate predictive accuracy.
+
+The likelihood ratio test, Wald test, and Score test all have p-values much less than 0.05, indicating that the model is statistically significant, and the model fits the data well. The p-value of the model is better than the basic model with only hormonal treatment, suggesting that the model with hormonal treatment, $x5e$ and $x6$ is a better fit. The individual p-values for hormonal treatment, $x5e$ and $x6$ indicate that they are all statistically significant.
+
+Hence, our optimized Cox regression model with hormonal treatment, $x5e$ and $x6$ as covariates is the best fit for the data.
+
+$h(t | hormon, x5e, x6) = h_0(t) exp(\beta_1 \times hormon + \beta_2 \times x5e + \beta_3 \times x6)$
+
+where $h(t | hormon, x5e, x6)$ is the hazard function at time $t$ given hormonal treatment, the decaying exponential function of number of positive nodes and the progesterone receptor level, $h_0(t)$ is the baseline hazard function, $\beta_1$ is the regression coefficient for hormonal treatment, $\beta_2$ is the regression coefficient for the decaying exponential function of number of positive nodes and $\beta_3$ is the regression coefficient for the progesterone receptor level.
+
+The Cox regression model estimates the hazard ratio $(\psi)$ for hormonal treatment compared to no hormonal treatment. The estimand of choice is the hazard ratio, which represents the relative risk of recurrence for patients receiving hormonal treatment compared to those not receiving hormonal treatment after adjusting for decaying exponential function of number of positive nodes $(x5e)$ and progesterone receptor level $(x6)$. This is equivalent to the exponential of the regression coefficient $\beta_1$ in the Cox regression model.
 
 The Cox regression model assumes that the hazard of breast cancer recurrence is proportional between the two treatment arms i.e., hazard ratio between groups is constant over time.
 
 The findings from the Cox regression model are as follows:
 
-- **Hazard Ratio:** The hazard ratio for hormonal treatment compared to no hormonal treatment is estimated to be $\psi = exp(\beta) = 0.695$. This indicates that the hazard of breast cancer recurrence for patients receiving hormonal therapy is 30.5% lower than for those not receiving hormonal therapy, after adjusting for hormonal treatment in the model.
+- **Hazard Ratio of Hormonal Treatment:** The hazard ratio for hormonal treatment compared to no hormonal treatment is estimated to be $exp(\beta_1) = 0.6817$. This indicates that the hazard of breast cancer recurrence for patients receiving hormonal therapy is 31.83% lower than for those not receiving hormonal therapy, after adjusting for the decaying exponential function of number of positive nodes and progesterone receptor level in the model. The 95% confidence interval suggests that the true hazard ratio lies between 0.533 and 0.871 with 95% confidence. This is further supported by the Kaplan-Meier curves where the hormonal therapy arm shows a consistently higher survival probability compared to the no hormonal therapy arm.
 
-- **Statistical Significance:** The p-value associated with the $hormon$ parameter is much less than 0.05, indicating that the effect of hormonal treatment on the risk of recurrence is statistically significant.
+- **Hazard Ratio of x5e:** The hazard ratio for $x5e$ is estimated to be $exp(\beta_2) = 0.1283$. This indicates that the hazard of breast cancer recurrence is 87.17% lower for each unit increase in the decaying exponential function of number of positive nodes ($x5e$), after adjusting for hormonal treatment and progesterone receptor level in the model. The 95% confidence interval suggests that the true hazard ratio lies between 0.082 and 0.1997 with 95% confidence. This suggests that number of positive nodes has incremental effect on the hazard of breast cancer recurrence in the form of decaying exponential function.
 
-- **Confidence Interval:** The 95% confidence interval suggests that the true hazard ratio for hormonal treatment compared to no hormonal treatment lies between 0.544 and 0.888 with 95% confidence. It does not include 1, further supporting the significance of the hormonal treatment effect. This is shown in the Kaplan-Meier curves where the hormonal therapy arm shows a consistently higher survival probability compared to the no hormonal therapy arm.
-
-- **Model Fit:** The model fits the data reasonably well, as indicated by the small p-values of Likelihood ratio test, Wald test, and Score test. The concordance index of 0.543 indicates that the model has poor predictive accuracy, but this is expected given the simplicity of the model and the limited number of covariates included. This tells us that the Cox regression model cannot predict the survival of patients with high accuracy.
-
-In conclusion, we can say that the Cox regression model fitted to data from 686 patients with 299 recurrence events, using recurrence status and follow up time, suggests that hormonal treatment is associated with a significantly lower risk of breast cancer recurrence compared to no hormonal treatment, with an estimated hazard ratio of 0.695.
+- **Hazard Ratio of x6:** The hazard ratio for progesterone receptor level $x6$ is estimated to be $exp(\beta_3) = 0.9975$. This indicates that the hazard of breast cancer recurrence is almost constant for each unit increase in the progesterone receptor level ($x6$), after adjusting for hormonal treatment and decaying exponential function of number of positive nodes in the model. The 95% confidence interval suggests that the true hazard ratio lies between 0.9964 and 0.9985 with 95% confidence. This suggests that progesterone receptor level has a minimal effect on the hazard of breast cancer recurrence.
 
 
 ### Q3. Provide a formal test for proportional hazards by treatment arm. Clearly describe which test, motivate why you chose that test, and describe what the test found.
 
 To test for the proportional hazards assumption by treatment arm, we can use the Schoenfeld residuals test. The Schoenfeld residuals test is a widely used and straightforward method for assessing the proportional hazards assumption in Cox regression models. 
 
-This test examines whether the scaled Schoenfeld residuals for a given covariate ($hormon$) are independent of time. If they are not independent of time, it suggests that the hazard ratio for that covariate is not constant over time, violating the proportional hazards assumption.
+This test examines whether the scaled Schoenfeld residuals for a given covariate are independent of time. If they are not independent of time, it suggests that the hazard ratio for that covariate is not constant over time, violating the proportional hazards assumption.
 
 **Null Hypothesis** $H_0$: The effect of hormonal treatment on the hazard of recurrence is constant over time (proportional hazards assumption holds).
 
@@ -456,7 +481,7 @@ We use the `cox.zph` function in R to perform the Schoenfeld residuals test, whi
 ```{r, warning=FALSE, message=FALSE}
 
 # Test for proportional hazards using Schoenfeld residuals
-schoenfeld_test <- cox.zph(cox_model)
+schoenfeld_test <- cox.zph(cox_model_optm)
 
 # Display the results of the Schoenfeld residuals test
 schoenfeld_test
@@ -464,34 +489,39 @@ schoenfeld_test
 
 The Schoenfeld residuals test results are as follows:
 
-- **Chi-square test statistic:** The chi-square test statistic is 0.227 with 1 degree of freedom, because of one covariate in the model.
-- **Hormonal Treatment:** The p-value for the test of proportional hazards for hormonal treatment is 0.63, which is not statistically significant. Hence, we do not reject the null hypothesis. 
-- **Global Test:** The global test for the proportional hazards assumption has a p-value of 0.63, which is not statistically significant. This suggests that the proportional hazards assumption holds for the Cox regression model by treatment arm.
+- **Hormonal Treatment:** The p-value for the test of proportional hazards for hormonal treatment is 0.68, which is not statistically significant. Hence, we do not reject the null hypothesis. This suggests that the hazard ratio for hormonal treatment is constant over time, supporting the validity of the Cox regression model.
 
-The non-significant p-values for both the global test and the test for hormonal treatment suggest that the proportional hazards assumption holds for the Cox regression model by treatment arm. This means that the hazard ratio for hormonal treatment is constant over time, supporting the validity of the Cox regression model.
+- **x5e:** The p-value for the test of proportional hazards for $x5e$ is 0.21, which is not statistically significant. Hence, we do not reject the null hypothesis. This suggests that the hazard ratio for the decaying exponential function of number of positive nodes is constant over time, which says that time-varying effect of $x5e$ is not significant.
+
+- **x6:** The p-value for the test of proportional hazards for $x6$ is 0.039, which is statistically significant. Hence, we reject the null hypothesis. This suggests that the hazard ratio for the progesterone receptor level is not constant over time, violating the proportional hazards assumption.
+
+- **Global Test:** The global test for the proportional hazards assumption has a p-value of 0.156, which is not statistically significant. This suggests that the proportional hazards assumption holds for the model as a whole.
+
+Since the variable $x6$ violates the proportional hazards assumption and has minimal effect on the hazard ratio, we can further check whether the cox model with only hormonal treatment and x5e is a better fit for the data using graphical evaluation of proportional hazards.
+
 
 ### Q4. Provide a plot to graphically evaluation whether there is evidence for proportional hazards. Motivate your choice of method, and describe the method and the results of the evaluation. 
 
 To graphically evaluate whether there is evidence for proportional hazards, we can plot the scaled Schoenfeld residuals against time. This plot can help us visually assess whether the residuals are independent of time, which is a key assumption for proportional hazards. 
 
-The plot shows the residuals as a function of time, with a horizontal line at zero indicating that the residuals are independent of time. If the line is not horizontal, it suggests that the proportional hazards assumption is violated, and the hazard ratio is not constant over time, else if the line is horizontal, it indicates that the proportional hazards assumption holds.
+The plot shows the residuals as a function of time, with a horizontal line at zero indicating that the residuals are independent of time. If the line shows a systematic pattern or trend, it suggests that the proportional hazards assumption is violated, and the hazard ratio is not constant over time, else if the line is horizontal, it indicates that the proportional hazards assumption holds.
 
 ```{r, warning=FALSE, message=FALSE}
-# Plot the Schoenfeld residuals against time
-plot(schoenfeld_test, 
-     var = 1, 
-     resid = TRUE, # plot residuals
-     se = TRUE,    # plot confidence bands
-     xlab = "Time", 
-     ylab = "Beta(t) for hormon", 
-     main = "Schoenfeld Residuals")
-abline(h = 0, col = "red", lty = 2) # add a horizontal line at zero
+par(mfrow=c(1,1))
+for (var in 1:3)
+    plot(schoenfeld_test,var=var,resid=TRUE, se=TRUE, main="Schoenfeld residuals",
+         ylim=c(-4,4))
 ```
 
-- The curve is very close to horizontal and centered around zero, which supports the proportional hazards assumption.
-- The confidence interval bands around the residuals are narrow and do not show any systematic pattern, further supporting the assumption of proportional hazards.
+- The curve for hormonal treatment is very close to horizontal and centered around zero, which supports the proportional hazards assumption. The residuals are randomly scattered around zero, indicating that the hazard ratio for hormonal treatment is constant over time. The confidence interval bands around the residuals are narrow and do not show any systematic pattern, further supporting the assumption of proportional hazards. This is supported by the p-value obtained from the Schoenfeld residuals test, which indicated that the proportional hazards assumption holds for hormonal treatment.
 
-In conclusion, the graphical evaluation of the Schoenfeld residuals against time shows no evidence of violation of the proportional hazards assumption for the Cox regression model by treatment arm. The residuals are independent of time, indicating that the hazard ratio for hormonal treatment is constant over time.
+- The curve for $x5e$ is almost horizontal with confidence interval bands including zero, which indicates that the proportional hazards assumption holds for the decaying exponential function of number of positive nodes. The residuals are randomly scattered around zero, suggesting that the hazard ratio for $x5e$ is constant over time. This is supported by the p-value obtained from the Schoenfeld residuals test, which indicated that the proportional hazards assumption holds for $x5e$.
+
+- The curve for progesterone receptor level $x6$ is exactly horizontal with confidence interval bands coinciding with zero, which indicates that the proportional hazards assumption holds for the progesterone receptor level. The residuals are tightly clustered around zero, suggesting that the hazard ratio for $x6$ is constant over time. This is in contradiction with the p-value obtained from the Schoenfeld residuals test, which indicated that the proportional hazards assumption is violated for $x6$. Although, the coefficient of $x6$ is very close to zero, hence, the effect on the hazard ratio is minimal.
+
+
+Hence, the proportional hazards assumption holds for the variables hormonal treatment and $x5e$. In conclusion, we can say that the model with hormonal treatment and $x5e$ is a better fit for the data and provides a valid representation of the hazard of breast cancer recurrence.
+
 
 ---
 
@@ -507,7 +537,7 @@ For the research question of *Does low-dose aspirin improve survival for patient
 
 - **Estimator:** The hazard ratio is primarily estimated using the Cox proportional hazards model. This model is mainly used for time-to-event data, and can adjust for potential confounders, handle censoring data, and assess the effect of low-dose aspirin on cause-specific death due to colorectal cancer. The Cox model is suitable for this study as it can model time-varying covariates, adjust for potential confounders, does not require assumption about underlying survival distribution and assess the effect of low-dose aspirin on survival.
 
-- **Assessment of Potential Confounding:** Potential confounding can be modelled by adjusting for covariates that are associated with both the treatment and the outcome. Confounders may include age, sex, cancer stage, and other variables that can potentially influence the effect of low-dose aspirin on survival.
+- **Assessment of Potential Confounding:** Potential confounding can be modelled by adjusting for covariates that are associated with both the treatment and the outcome. Confounders may include age, sex, cancer stage, and other variables that can potentially influence the effect of low-dose aspirin on survival. We will assess potential confounding by examining the association between the covariates and the outcome and check the significance of the covariates in the model to include them as confounders.
 
 - **Modeling for Potential Confounding:** We will adjust for potential confounders by including them as covariates in the Cox regression model. The regression model will look like: 
 
@@ -548,5 +578,5 @@ We can also use Aalen's additive hazards model, which estimates the additive eff
 I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to improve my summarization and writing skills.
 
 
-This assignment took me approximately 20 hours to complete.
+This assignment took me approximately 23 hours to complete.
 
