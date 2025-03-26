@@ -30,9 +30,8 @@ $\Rightarrow S(t | x) = \exp(-\lambda t^{k} \exp(\beta x))$
 which is in form $S(t | x) = \exp(-\tilde\lambda_a t^{k})$ where $\tilde\lambda_a = \lambda \exp(\beta x)$ is the new scale parameter
 for the same shape parameter $k$.
 
-This means that the survival function $S(t|x)$ for a proportional hazards model is also from a Weibull distribution.
+Hence, the survival function $S(t|x)$ for a proportional hazards model is also from a Weibull distribution.
 
-Here, $S(t) = E_X[S(t \mid X)]$, which will also be from a Weibull distribution.
 
 ### Q2. For an accelerated failure time model with $S_0(t)$ that is a Weibull distribution, show that survival $S(t)$ is also from a Weibull distribution.
 
@@ -49,9 +48,7 @@ $\Rightarrow S(t | x) = \exp(-\lambda t^{k} \exp(-k \tilde\beta x))$
 which is in form $S(t | x) = \exp(-\tilde\lambda_b t^{k})$ where $\tilde\lambda_b = \lambda \exp(-k \tilde\beta x)$ is the
 new scale parameter for the same shape parameter $k$.
 
-This means that the survival function $S(t|x)$ for an accelerated failure time model is also from a Weibull distribution.
-
-Similarly, $S(t) = E_X[S(t \mid X)]$, which will also be from a Weibull distribution.
+Hence, the survival function $S(t|x)$ for an accelerated failure time model is also from a Weibull distribution.
 
 
 ### Q3. What is the relationship between $\beta$ and $\tilde\beta$ if both models have a Weibull baseline survival function?
@@ -60,7 +57,7 @@ For the proportional hazards model, we have $S(t | x) = \exp(-\lambda t^{k} \exp
 
 For the accelerated failure time model, we have $S(t | x) = \exp(-\lambda t^{k} \exp(-k \tilde\beta x))$.
 
-Comparing the two models, we get $\exp(\beta x) = \exp(-k \tilde\beta x)$.
+Equating the two models, we get $\exp(\beta x) = \exp(-k \tilde\beta x)$.
 
 Taking the natural logarithm of both sides, we get $\beta x = -k \tilde\beta x$.
 
@@ -81,7 +78,9 @@ $L_i = \frac{S(u_i) - S(v_i)}{S(t_i)}$
 
 where $S(t)$ is the Survival function.
 
-Hence, the log-likelihood in terms of Survival function $S(t)$ at time $t$ is given by $\log(S(u_i) - S(v_i)) - \log(S(t_i))$.
+This represents the probability that the event occurs in the interval $(u_i, v_i]$ given that the event has not occurred before $u_i$ and the individual survives up to $t_i$ and is at risk at time $t_i$.
+
+Hence, the log-likelihood in terms of Survival function $S(t)$ at time $t$ for this data tuple is given by $\log(S(u_i) - S(v_i)) - \log(S(t_i))$.
 
 ### Q1b. Express the log-likelihood in terms of the hazard function $h(t)$ at time $t$:
 
@@ -112,15 +111,15 @@ Hence, the log-likelihood in terms of the hazard function $h(t)$ at time $t$ is 
 
 ### Q2. Can you express these data using the Surv function from the survival package? If so, show an example; if not, explain why.
 
-Yes, we can express the interval-censored data using the `Surv` function from the `survival` package.
-
 The `Surv` function is used to create a survival object that represents the survival time of an individual. It takes the form `Surv(time, event)` where `time` is the survival time and `event` is the event indicator.
 
 For interval-censored data, we can use the `Surv` function as `Surv(time, time2, type = "interval2")` where `time` is the start of the interval, `time2` is the end of the interval and type `interval2` is used to indicate interval-censored data effectively.
 
 Although, the `Surv` function doesn't support left truncation directly, we can filter out the left truncated data by taking the maximum of the entry time and the left truncation time.
 
-Here is an example of how to express left-truncated interval-censored data using the `Surv` function:
+In conclusion, we cannot directly use the `Surv` function to directly express left truncated interval censored data, but we can indirectly use it to express by filtering beforehand. 
+
+Here is an example of how to express left-truncated interval-censored data indirectly using the `Surv` function:
 
 ```{r}
 
@@ -157,7 +156,7 @@ $P(T > t| T > t_0)$
 
 $\Rightarrow \frac{P(T > t, T > t_0)}{P(T > t_0)}$ by definition of conditional probability.
 
-$\Rightarrow \frac{P(T > t)}{P(T > t_0)}$ because $T > t, T > t_0$ implies $T > t$ as $t_0$ is the left truncation time. 
+$\Rightarrow \frac{P(T > t)}{P(T > t_0)}$ because $(T > t, T > t_0)$ implies $(T > t)$ as $t_0$ is the left truncation time. 
 
 Since, $P(T > t) = S(t)$ and $P(T > t_0) = S(t_0)$ by the survival function for $T$, 
 
@@ -180,11 +179,7 @@ $\Rightarrow Q(p|t_0) = S^{-1}((1-p)S(t_0))$.
 
 To solve for $S^{-1}((1-p)S(t_0))$, we know that $Q(p) = S^{-1}(1-p) \rightarrow Q(1-p) = S^{-1}(p)$.
 
-Hence, for a $y$, we can say that $S^{-1}(y) = Q(1-y)$,
-
 $\Rightarrow Q(p|t_0) = S^{-1}((1-p)S(t_0)) =  Q(1-(1-p)S(t_0))$.
-
-$\Rightarrow Q(p|t_0) = Q(1-(1-p)S(t_0))$.
 
 i.e., the $p$-th quantile of left truncated distribution is the ($1 - (1-p)S(t_0)$)-th quantile of the original distribution.
 
@@ -241,17 +236,11 @@ rtrunc_lnorm = function(n, meanlog, sdlog, t0) {
 }
 ```
 
-Now, let's try to compute the 0.4 quantile for the above random numbers using the `quantile` function in R for large sample sizes of $n = 10,000$ and $n = 100,000$.
+Now, let's try to compute the 0.4 quantile for the above random numbers using the `quantile` function in R for large sample sizes of $n = 100,000$ and $n = 1,000,000$.
 
 ```{r}
 # set seed for reproducibility
 set.seed(123)
-
-# generate 10,000 random numbers from truncated log-normal distribution
-y = rtrunc_lnorm(n = 10000, meanlog = 1, sdlog = 1.2, t0 = 2)
-
-# calculate the 0.4 quantile
-quantile(y, 0.4)
 
 # generate 100,000 random numbers from truncated log-normal distribution
 y = rtrunc_lnorm(n = 100000, meanlog = 1, sdlog = 1.2, t0 = 2)
@@ -259,9 +248,15 @@ y = rtrunc_lnorm(n = 100000, meanlog = 1, sdlog = 1.2, t0 = 2)
 # calculate the 0.4 quantile
 quantile(y, 0.4)
 
+# generate 1,000,000 random numbers from truncated log-normal distribution
+y = rtrunc_lnorm(n = 1000000, meanlog = 1, sdlog = 1.2, t0 = 2)
+
+# calculate the 0.4 quantile
+quantile(y, 0.4)
+
 ```
 
-We can see that the 0.4 quantile is approximately 4.149 and 4.165 by randomly sampling $t$ values from a truncated log-normal distribution of $T$ for $n = 10,000$ and $n = 100,000$ respectively. This is very close to the value of 4.172 obtained from the algorithm in question C3.
+This is very close to the value of 4.172 obtained from the algorithm in question C3.
 
 
 ---
@@ -280,13 +275,15 @@ For an individual $i$ who experiences an event at time $t_i$, the conditional pr
 
 $\frac{h_i(t_i|x_i)}{\sum_{j \in R(t_i)} h_j(t_i|x_i)}$
 
-Substituting the above form of the hazard function, the baseline hazard $h_0(t_i)$ cancels out from the numerator and the denominator:
+$\Rightarrow \frac{exp(x_i(t_i)^{T} \beta) h_0(t_i)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta) h_0(t_i)}$
 
-$\frac{exp(x_i(t_i)^{T} \beta) h_0(t_i)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta) h_0(t_i)} = \frac{exp(x_i(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)}$.
+$\Rightarrow \frac{exp(x_i(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)}$.
 
-Hence, the partial likelihood function $L(\beta)$ is the product of these conditional probabilities over all individuals for whom an event is observed: 
+Hence, the partial likelihood function $L(\beta)$ is the product of these conditional probabilities over all $n$ individuals for whom an event is observed: 
 
 $L(\beta) = \prod_{i=1}^{n} \left ( \frac{exp(x_i(t_i)^{T} \beta)}{\sum_{j \in R(t_i)} exp(x_j(t_i)^{T} \beta)} \right)^{\delta_i}$
+ 
+where $\delta_i$ is the event indicator for individual $i$, $x_i(t_i)$ is the time-varying effects vector for individual $i$ at observed time $t_i$, $R(t_i)$ is the risk set at time $t_i$, $\beta$ is the vector of regression coefficients.
 
 Note that the $x_j$ in the denominator are evaluated at time $t_i$ .
 
@@ -334,11 +331,9 @@ From the above code, the cox regression model being fitted can be written as:
 
 $\mathbf{h(t| stage) = h_0(t) exp(\beta_1 \times stageUnknown + \beta_2 \times stageRegional + \beta_3 \times stageDistant + \beta_4 \times tt(stage))}$.
 
-where $h(t| stage)$ is the hazard function at time $t$ given the stage of cancer, $h_0(t)$ is the baseline hazard function, and $\beta_1, \beta_2, \beta_3, \beta_4$ are the regression coefficients for the stage of cancer.
+where $h(t| stage)$ is the hazard function at time $t$ given the stage of cancer, $h_0(t)$ is the baseline hazard function, $\beta_1, \beta_2, \beta_3, \beta_4$ are the regression coefficients for the stage of cancer, $tt(stage)$ is the time-varying effect for the Distant stage and $stageUnknown, stageRegional, stageDistant$ are indicator variables for the Unknown, Regional, and Distant stages of cancer respectively.
 
-The model includes three stages of cancer, such as Unknown, Regional, Distant, and a time-varying effect `tt(stage)`, defined as $(x == Distant) \times t/12$, which is only applicable when the stage is Distant. 
-
-Here, Localised is the reference level for the stage of cancer.
+Here, $tt(stage)$ is defined as $(x == Distant) \times t/12$ and Localised is the reference level for the stage of cancer.
 
 The four parameters in question are:
 
@@ -347,12 +342,9 @@ The four parameters in question are:
  - $\beta_3$: The log hazard ratio between the Distant stage and the Localised stage of cancer at $t=0$.
  - $\beta_4$: The time-dependent change in the log hazard ratio between the Distant stage and the Localised stage of cancer per year. 
  
-The p-value of each parameter is a very small value, much less than 0.05, indicating that the parameters are all statistically significant. This means that all stages of cancer have a significant impact on the hazard of death from cancer compared to the Localised stage. 
+The p-value of each parameter is a very small value $( \ll 0.05)$, indicating that the parameters are all statistically significant. This means that all stages of cancer have a significant impact on the hazard of death from cancer compared to the Localised stage and the hazard ratio between Distant and Localised cancer varies over time.
 
-The time-varying effect for the Distant stage is also significant, indicating that the hazard ratio between Distant and Localised cancer varies over time.
-
-
-Let us interpret these parameters using the hazard ratios mentioned in the summary:
+Interpretation of the parameters:
 
  - Patients with Unknown stage cancer have $exp(\beta_1) \sim$ **2.56** times higher risk of death from cancer compared to patients with Localised stage cancer.
  - Patients with Regional stage cancer have $exp(\beta_2) \sim$ **2.23** times higher risk of death from cancer compared to patients with Localised stage cancer.
@@ -385,18 +377,20 @@ summary(fit, times = 1:5)
 
 # Plot the kaplan-meier curves
 plot(fit, 
-     col = c("blue", "red"), 
+     col = c("blue","lightblue", "lightblue", "red", "pink", "pink" ), 
      lty = c(1,1), 
-     mark.time = TRUE, # display censored events
-     xlab = "Time to recurrence (months)", 
+     conf.int = TRUE, # display confidence intervals
+     xlab = "Recurrence free survival time (in days)", 
      ylab = "Estimated Survival Probability", 
      main = "Kaplan-Meier Curves by Randomisation Arm")
 
 # Add a legend
 legend("topright", 
-       legend = c( "Hormonal Therapy", "No Hormonal Therapy"),
-       col = c("red", "blue"), 
-       lty = c(1,1))
+       legend = c( "Hormonal Therapy", "No Hormonal Therapy", 
+                   "95% CI Hormonal Therapy", "95% CI No Hormonal Therapy"),
+       col = c("red", "blue", "pink", "lightblue"), 
+       lty = c(1,1), 
+       cex = 0.7)
 
 ```
 
@@ -405,7 +399,8 @@ We see the following pattern in the Kaplan-Meier curves:
 - **Initial Survival Probability:** At time zero, both curves start at survival probability 1.0 as no patients have experienced recurrence yet.
 - **Separation of Curves:** The survival probability for patients receiving hormonal therapy remains higher than those not receiving hormonal therapy throughout the follow-up period. This indicates that hormonal therapy is associated with a lower risk of recurrence.
 - **Nature of the Curves:** The Kaplan Meier estimate remains constant between events and drops only at observed recurrence times, leading to stepwise changes in the curves. The curves show a decreasing trend in survival probability over time as more patients experience recurrence.
-- **Censoring:** Censored events are marked by small vertical ticks, indicating patients who were censored, i.e., did not experience recurrence during the follow-up period.
+- **Confidence Intervals:** The lighter lines around the Kaplan-Meier curves represent the 95% confidence intervals for the survival probabilities. The confidence intervals are wider at later time points due to fewer patients being at risk. The upper bound of no hormonal therapy arm and the lower bound of hormonal therapy arm jump above and below each other throughout the follow-up period.
+- **Drop in Survival Probability:** The survival probability drops sharply at 2500 days for the no hormonal therapy arm to 0.2 survival probability, indicating fewer patients surviving without recurrence after 7 years. Whereas, the hormonal therapy arm shows a more gradual decrease in survival probability at around 500 and 2000 days.
 
 The hormonal therapy arm shows a consistently higher survival probability compared to the no hormonal therapy arm, indicating a beneficial effect of hormonal therapy in reducing the risk of recurrence in breast cancer patients.
 
@@ -461,7 +456,6 @@ We use the `cox.zph` function in R to perform the Schoenfeld residuals test, whi
 ```{r, warning=FALSE, message=FALSE}
 
 # Test for proportional hazards using Schoenfeld residuals
-cox_model <- coxph(Surv(rectime, censrec) ~ hormon, data = brcancer)
 schoenfeld_test <- cox.zph(cox_model)
 
 # Display the results of the Schoenfeld residuals test
@@ -489,12 +483,12 @@ plot(schoenfeld_test,
      resid = TRUE, # plot residuals
      se = TRUE,    # plot confidence bands
      xlab = "Time", 
-     ylab = "Scaled Schoenfeld Residuals", 
-     main = "Schoenfeld Residuals Test for Proportional Hazards")
+     ylab = "Beta(t) for hormon", 
+     main = "Schoenfeld Residuals")
 abline(h = 0, col = "red", lty = 2) # add a horizontal line at zero
 ```
 
-- The solid line is horizontal and centered around zero, which supports the proportional hazards assumption.
+- The curve is very close to horizontal and centered around zero, which supports the proportional hazards assumption.
 - The confidence interval bands around the residuals are narrow and do not show any systematic pattern, further supporting the assumption of proportional hazards.
 
 In conclusion, the graphical evaluation of the Schoenfeld residuals against time shows no evidence of violation of the proportional hazards assumption for the Cox regression model by treatment arm. The residuals are independent of time, indicating that the hazard ratio for hormonal treatment is constant over time.
@@ -509,9 +503,9 @@ For the research question of *Does low-dose aspirin improve survival for patient
 
 ### Analysis Plan:
 
-- **Estimand of Interest:** Hazard Ratio comparing the cause-specific death due to colorectal cancer between the experimental arm (low-dose aspirin) and the control arm (no low-dose aspirin) for patients with a particular genetic signature. Hazard ratio less than 1 indicates a beneficial effect of low-dose aspirin on survival.
+- **Estimand of Interest:** Causal effect of low-dose aspirin on the survival of patients can be measured by comparing the cause-specific death due to colorectal cancer between the experimental arm (low-dose aspirin) and the control arm (no low-dose aspirin) for patients with a particular genetic signature. This can be quantified using the Hazard Ratio, which is the ratio of the hazard of death due to colorectal cancer in the experimental arm to the hazard in the control arm. The hazard ratio is easy to interpret and provides a measure of the relative risk of death due to colorectal cancer between the two arms. Hazard ratio less than 1 indicates a beneficial effect of low-dose aspirin on survival.
 
-- **Estimator:** The primary estimator for hazard ratio is Cox proportional hazards model, which is suitable for time-to-event data, can adjust for potential confounders, handle censoring data and assess the effect of low-dose aspirin on cause-specific death due to colorectal cancer. It does not require assumption about underlying survival distribution and can model time-varying covariates.
+- **Estimator:** The hazard ratio is primarily estimated using the Cox proportional hazards model. This model is mainly used for time-to-event data, and can adjust for potential confounders, handle censoring data, and assess the effect of low-dose aspirin on cause-specific death due to colorectal cancer. The Cox model is suitable for this study as it can model time-varying covariates, adjust for potential confounders, does not require assumption about underlying survival distribution and assess the effect of low-dose aspirin on survival.
 
 - **Assessment of Potential Confounding:** Potential confounding can be modelled by adjusting for covariates that are associated with both the treatment and the outcome. Confounders may include age, sex, cancer stage, and other variables that can potentially influence the effect of low-dose aspirin on survival.
 
@@ -520,7 +514,7 @@ For the research question of *Does low-dose aspirin improve survival for patient
 $h(t| aspirin, X) = h_0(t) exp(\beta \times aspirin + \gamma \times X)$, 
 
 where $h(t| aspirin, X)$ is the hazard function at time $t$ given aspirin treatment and covariates $X$, such as age, sex, etc.
-$h_0(t)$ is the baseline hazard function for no aspirin treatment and the reference levels of all the covariates, $\beta$ is the regression coefficient for aspirin treatment, and $\gamma$ are the regression coefficients for covariates $X$.
+$h_0(t)$ is the baseline hazard function for no aspirin treatment and the reference levels of all the covariates, $\beta$ is the regression coefficient for aspirin treatment, $aspirin$ is the indicator variable for low-dose aspirin treatment, and $\gamma$ are the regression coefficients for covariates $X$.
 
 By adjusting for confounders, we want to estimate the total effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other factors that may confound the relationship.
 
@@ -539,20 +533,20 @@ Hence, with the help of the Cox proportional hazards model, we can estimate the 
 
 Yes, non-collapsibility can be an issue for the chosen estimator, the Cox proportional hazards model. Hazard ratio in Cox proportional hazards model is a non-collapsible measure of association. This means that the marginal hazard ratio, i.e., the hazard ratio seen when not conditioned on any other variables, can be different from the conditional hazard ratio, i.e., the hazard ratio seen when conditioned on other variables. This can be seen even when the other variables are not confounders. 
 
-We see conditional hazard ratio in the Cox model, since hazard function is defined as: 
+We estimate the conditional hazard ratio in the Cox model, since hazard function is defined as: 
 
 $h(t| aspirin, X) = h_0(t) exp(\beta \times aspirin + \gamma \times X)$.
 
-In the context of the study, non-collapsibility can be an issue if we are interested in the marginal effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other covariates, such as the patient's age, sex and their stage of cancer. The conditional hazard ratio estimated by the Cox model may not represent the marginal effect of low-dose aspirin on survival. 
-
-The marginal estimands are useful for representing the causal effect of the treatment on the outcome across a population, while the conditional estimands are useful for understanding the effect of the treatment within a specific subgroup, such as patients with a particular age group or cancer stage.
+In the context of the study, non-collapsibility can be an issue if we are interested in the marginal effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other covariates, such as the patient's age, sex and their stage of cancer, i.e., when estimating the causal effect of the treatment across a population. Whereas, the conditional hazard ratio estimated by the Cox model is estimating the effect within a specific subgroup, such as patients with a particular age group or cancer stage.
 
 We can address the non-collapsibility by using regression standardisation to calculate the marginal effect, which can provide a better interpretative measure of the effect of low-dose aspirin from the conditional model. This method can help us estimate the average causal effect of low-dose aspirin on cause-specific death due to colorectal cancer, independent of other covariates.
+
+We can also use Aalen's additive hazards model, which estimates the additive effect of low-dose aspirin on the cumulative hazard function, providing a collapsible measure of the marginal effect of the treatment. Although, in practice, the Cox model is widely used due to its flexibility and ease of interpretation, it is important to be aware of the non-collapsibility issue when interpreting the hazard ratios from the model.
 
 ---
 
 I am declaring that I have used generative artificial intelligence (GAI) to assist me in completing this assignment in the form of Github co-pilot to improve my summarization and writing skills.
 
 
-This assignment took me approximately 16 hours to complete.
+This assignment took me approximately 20 hours to complete.
 
